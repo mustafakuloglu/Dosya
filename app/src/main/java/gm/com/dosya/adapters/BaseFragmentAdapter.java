@@ -67,14 +67,13 @@ public class BaseFragmentAdapter extends BaseAdapter {
                 (TextView) satirView.findViewById(R.id.textView);
         TextView valueTextView =
                 (TextView) satirView.findViewById(R.id.valueTextView);
-        TextView typeTextView =
-                (TextView) satirView.findViewById(R.id.typeTextView);
+
         ImageView imageView =(ImageView)satirView.findViewById(R.id.imageView);
         ListItem item = liste.get(position);
-
+        imageView.setImageResource(item.getIcon());
         textView.setText(item.getTitle());
         valueTextView.setText(item.getSubtitle());
-        typeTextView.setText(item.getThumb());
+
         return satirView;
     }
 
