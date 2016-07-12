@@ -9,7 +9,7 @@
         android:layout_marginLeft="16dp"
         android:paddingTop="5dp"
         android:id="@+id/imageView"
-        android:src="@drawable/ic_external_storage" />
+        />
 
     <TextView
         android:layout_width="wrap_content"

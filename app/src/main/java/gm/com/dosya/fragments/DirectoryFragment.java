@@ -306,6 +306,7 @@ public class DirectoryFragment extends Fragment {
                             ext.title = "ExternalStorage";
                         }
                         item.icon = R.drawable.ic_external_storage;
+                        item.title="ExtSdcard";
                         item.subtitle = getRootSubtitle(path);
                         item.file = new File(path);
                         items.add(item);
