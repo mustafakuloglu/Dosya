@@ -74,7 +74,7 @@ public class BaseFragmentAdapter extends BaseAdapter {
 
         textView.setText(item.getTitle());
         valueTextView.setText(item.getSubtitle());
-        typeTextView.setText(item.getThumb());
+
         return satirView;
     }
 
