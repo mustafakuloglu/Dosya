@@ -16,7 +16,9 @@ import android.support.v4.app.Fragment;
 import android.util.Base64;
 import android.util.Log;
 import android.util.StateSet;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,6 +59,8 @@ public class DirectoryFragment extends Fragment {
     private long sizeLimit = 1024 * 1024 * 1024;
 
     private String[] chhosefileType = {".pdf", ".doc", ".docx", ".DOC", ".DOCX"};
+
+
 
     private class HistoryEntry {
         int scrollItem, scrollOffset;
@@ -140,6 +144,10 @@ public class DirectoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+
+
+
+
         if (!receiverRegistered) {
             receiverRegistered = true;
             IntentFilter filter = new IntentFilter();
@@ -171,16 +179,8 @@ public class DirectoryFragment extends Fragment {
             listView = (ListView) fragmentView.findViewById(R.id.listView);
             listView.setEmptyView(emptyView);
             listView.setAdapter(baseAdapter);
-            listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
-            {
-
-                @Override
-                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                    showErrorBox("Uzun Basıldı");
-
-                    return false;
-                }
-            });
+         
+            registerForContextMenu(listView);
 
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
@@ -245,7 +245,43 @@ public class DirectoryFragment extends Fragment {
             }
         }
         return fragmentView;
+
+
+
     }
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.setHeaderTitle("Context Menu");
+        menu.add(0, v.getId(), 0, "Kopyala");
+        menu.add(0, v.getId(), 0, "Yapıştır");
+        menu.add(0, v.getId(), 0, "Sil");
+    }
+    @Override
+    public boolean onContextItemSelected(final MenuItem item) {
+        // TODO Auto-generated method stub
+        int position;
+
+        if (item.getTitle() == "Sil") {
+            final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
+                    .getMenuInfo();
+            position = (int) info.id;
+            items.remove(position);
+            baseAdapter.notifyDataSetChanged();
+        }
+        return super.onContextItemSelected(item);
+    }
+
+
+
+
+
+
+
+
+
+
 
     private void listRoots() {
         currentDir = null;
