@@ -60,8 +60,6 @@ public class DirectoryFragment extends Fragment {
 
     private String[] chhosefileType = {".pdf", ".doc", ".docx", ".DOC", ".DOCX"};
 
-
-
     private class HistoryEntry {
         int scrollItem, scrollOffset;
         File dir;
@@ -144,10 +142,6 @@ public class DirectoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-
-
-
-
         if (!receiverRegistered) {
             receiverRegistered = true;
             IntentFilter filter = new IntentFilter();
@@ -179,7 +173,6 @@ public class DirectoryFragment extends Fragment {
             listView = (ListView) fragmentView.findViewById(R.id.listView);
             listView.setEmptyView(emptyView);
             listView.setAdapter(baseAdapter);
-         
             registerForContextMenu(listView);
 
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -245,43 +238,7 @@ public class DirectoryFragment extends Fragment {
             }
         }
         return fragmentView;
-
-
-
     }
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-                                    ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        menu.setHeaderTitle("Context Menu");
-        menu.add(0, v.getId(), 0, "Kopyala");
-        menu.add(0, v.getId(), 0, "Yapıştır");
-        menu.add(0, v.getId(), 0, "Sil");
-    }
-    @Override
-    public boolean onContextItemSelected(final MenuItem item) {
-        // TODO Auto-generated method stub
-        int position;
-
-        if (item.getTitle() == "Sil") {
-            final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
-                    .getMenuInfo();
-            position = (int) info.id;
-            items.remove(position);
-            baseAdapter.notifyDataSetChanged();
-        }
-        return super.onContextItemSelected(item);
-    }
-
-
-
-
-
-
-
-
-
-
 
     private void listRoots() {
         currentDir = null;
@@ -624,5 +581,28 @@ public class DirectoryFragment extends Fragment {
         String temp= Base64.encodeToString(b, Base64.DEFAULT);
         return temp;
     }
+    @Override
+public void onCreateContextMenu(ContextMenu menu, View v,
+                                ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.setHeaderTitle("Context Menu");
+        menu.add(0, v.getId(), 0, "Kopyala");
+        menu.add(0, v.getId(), 0, "Yapıştır");
+        menu.add(0, v.getId(), 0, "Sil");
+   }
+        @Override
+        public boolean onContextItemSelected(final MenuItem item) {
+    // TODO Auto-generated method stub
+            int position;
+
+            if (item.getTitle() == "Sil") {
+            final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
+                          .getMenuInfo();
+            position = (int) info.id;
+            items.remove(position);
+            baseAdapter.notifyDataSetChanged();
+     }
+              return super.onContextItemSelected(item);
+          }
 
 }

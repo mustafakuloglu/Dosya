@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -86,5 +87,16 @@ public class MainActivity extends AppCompatActivity {
             super.onBackPressed();
         }
     }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId())
+        {
+            case android.R.id.home:   Toast.makeText(getApplicationContext(), "basıldı", Toast.LENGTH_SHORT).show();
+        }
 
+
+        return true;
+    }
 }
+
+
