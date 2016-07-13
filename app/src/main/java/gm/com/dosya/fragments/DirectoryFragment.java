@@ -24,7 +24,6 @@ import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -177,7 +176,7 @@ public class DirectoryFragment extends Fragment {
 
                 @Override
                 public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                    showErrorBox("Uzun Basılsı");
+                    showErrorBox("Uzun Basıldı");
 
                     return false;
                 }
@@ -187,7 +186,7 @@ public class DirectoryFragment extends Fragment {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view,
                                         int i, long l) {
-                    Toast.makeText(getActivity(), "basıldı", Toast.LENGTH_LONG).show();
+
                     if (i < 0 || i >= items.size()) {
                         return;
                     }
@@ -257,9 +256,9 @@ public class DirectoryFragment extends Fragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
             if (Build.VERSION.SDK_INT < 9
                     || Environment.isExternalStorageRemovable()) {
-                ext.title = "SdCard";
+                ext.title = "Internal Storage";
             } else {
-                ext.title = "InternalStorage";
+                ext.title = "Internal Storage";
             }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
@@ -267,6 +266,7 @@ public class DirectoryFragment extends Fragment {
                     || Environment.isExternalStorageRemovable() ? R.drawable.ic_external_storage
                     : R.drawable.ic_storage;
         }
+
         ext.subtitle = getRootSubtitle(extStorage);
         ext.file = Environment.getExternalStorageDirectory();
         items.add(ext);
@@ -301,12 +301,12 @@ public class DirectoryFragment extends Fragment {
                     try {
                         ListItem item = new ListItem();
                         if (path.toLowerCase().contains("sd")) {
-                            ext.title = "SdCard";
+                            ext.title = "Internal Storage";
                         } else {
                             ext.title = "ExternalStorage";
                         }
                         item.icon = R.drawable.ic_external_storage;
-                        item.title="ExtSdcard";
+                        item.title = "Sdcard";
                         item.subtitle = getRootSubtitle(path);
                         item.file = new File(path);
                         items.add(item);
@@ -418,19 +418,30 @@ public class DirectoryFragment extends Fragment {
                 fname = fname.toLowerCase();
                 if (fname.endsWith(".jpg") || fname.endsWith(".png")
                         || fname.endsWith(".gif") || fname.endsWith(".jpeg")) {
-                    item.thumb = file.getAbsolutePath();
-                }/*
-                if (fname.endsWith(".jpg"))
-                {
-                    Bitmap myBitmap = BitmapFactory.decodeFile(file.getPath());
-                    item.thumb=BitMapToString(myBitmap);
-                }*/
+                    item.icon=R.drawable.foto;
+                }
+
+
+                if(fname.endsWith(".mp3") || (fname.endsWith(".amr")))
+                {item.icon=R.drawable.music;}
+                if(fname.endsWith(".zip") || (fname.endsWith(".rar")))
+                {item.icon=R.drawable.zip;}
+                if(fname.endsWith(".docx"))
+                {item.icon=R.drawable.word;}
+                if(fname.endsWith(".mp4")|| (fname.endsWith(".mpg")) || (fname.endsWith(".avi")) || (fname.endsWith(".3gp")))
+                {item.icon=R.drawable.video;}
+                if(fname.endsWith(".pdf"))
+                {item.icon=R.drawable.pdf;}
             }
+
+
+
+
             items.add(item);
         }
         ListItem item = new ListItem();
-        item.title = "GO BACK";
-        item.subtitle = "Previous Directory";
+        item.title = "Go Back";
+        item.subtitle = "Folder";
         item.icon = R.drawable.back;
         item.file = null;
         items.add(0, item);
@@ -439,6 +450,7 @@ public class DirectoryFragment extends Fragment {
         baseAdapter.notifyDataSetChanged();
         return true;
     }
+
 
     public static String formatFileSize(long size) {
         if (size < 1024) {
