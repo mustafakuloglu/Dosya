@@ -70,12 +70,7 @@ public class BaseFragmentAdapter extends BaseAdapter {
 
         ImageView imageView =(ImageView)satirView.findViewById(R.id.imageView);
         ListItem item = liste.get(position);
-      imageView.setImageResource(item.getIcon());
-
-
-
-
-       item.icon=R.drawable.ic_directory;
+        imageView.setImageResource(item.getIcon());
         textView.setText(item.getTitle());
         valueTextView.setText(item.getSubtitle());
 
