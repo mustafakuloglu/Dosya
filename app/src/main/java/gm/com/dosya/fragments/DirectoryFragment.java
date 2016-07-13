@@ -191,7 +191,7 @@ public class DirectoryFragment extends Fragment {
                         return;
                     }
                     ListItem item = items.get(i);
-                    File file = item.file;
+                    File file =item.getFile();
                     if (file == null) {
                         HistoryEntry he = history.remove(history.size() - 1);
                         title_ = he.title;
@@ -214,7 +214,7 @@ public class DirectoryFragment extends Fragment {
                             return;
                         }
                         history.add(he);
-                        title_ = item.title;
+                        title_ = item.getTitle();
                         updateName(title_);
                         listView.setSelection(0);
                     } else {
@@ -292,19 +292,19 @@ public class DirectoryFragment extends Fragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
             if (Build.VERSION.SDK_INT < 9
                     || Environment.isExternalStorageRemovable()) {
-                ext.title = "Internal Storage";
+                ext.setTitle("Internal Storage");
             } else {
-                ext.title = "Internal Storage";
+                ext.setTitle("Internal Storage");
             }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-            ext.icon = Build.VERSION.SDK_INT < 9
+            ext.setIcon(Build.VERSION.SDK_INT < 9
                     || Environment.isExternalStorageRemovable() ? R.drawable.ic_external_storage
-                    : R.drawable.ic_storage;
+                    : R.drawable.ic_storage);
         }
 
-        ext.subtitle = getRootSubtitle(extStorage);
-        ext.file = Environment.getExternalStorageDirectory();
+        ext.setSubtitle(getRootSubtitle(extStorage));
+        ext.setFile(Environment.getExternalStorageDirectory());
         items.add(ext);
         try {
             BufferedReader reader = new BufferedReader(new FileReader(
@@ -337,14 +337,14 @@ public class DirectoryFragment extends Fragment {
                     try {
                         ListItem item = new ListItem();
                         if (path.toLowerCase().contains("sd")) {
-                            ext.title = "Internal Storage";
+                            ext.setTitle("Internal Storage");
                         } else {
-                            ext.title = "ExternalStorage";
+                            ext.setTitle("ExternalStorage");
                         }
-                        item.icon = R.drawable.ic_external_storage;
-                        item.title = "Sdcard";
-                        item.subtitle = getRootSubtitle(path);
-                        item.file = new File(path);
+                        item.setIcon(R.drawable.ic_external_storage);
+                        item.setTitle("Sdcard");
+                        item.setSubtitle(getRootSubtitle(path));
+                        item.setFile(new File(path));
                         items.add(item);
                     } catch (Exception e) {
                         Log.e("tmessages", e.toString());
@@ -355,10 +355,10 @@ public class DirectoryFragment extends Fragment {
             Log.e("tmessages", e.toString());
         }
         ListItem fs = new ListItem();
-        fs.title = "/";
-        fs.subtitle = "SystemRoot";
-        fs.icon = R.drawable.ic_directory;
-        fs.file = new File("/");
+        fs.setTitle( "/");
+        fs.setSubtitle("SystemRoot");
+        fs.setIcon(R.drawable.ic_directory);
+        fs.setFile(new File("/"));
         items.add(fs);
 
         // try {
@@ -441,33 +441,33 @@ public class DirectoryFragment extends Fragment {
                 continue;
             }
             ListItem item = new ListItem();
-            item.title = file.getName();
-            item.file = file;
+            item.setTitle(file.getName());  ;
+            item.setFile(file);
             if (file.isDirectory()) {
-                item.icon = R.drawable.ic_directory;
-                item.subtitle = "Folder";
+                item.setIcon(R.drawable.ic_directory);
+                item.setSubtitle("Folder");
             } else {
                 String fname = file.getName();
                 String[] sp = fname.split("\\.");
-                item.ext = sp.length > 1 ? sp[sp.length - 1] : "?";
-                item.subtitle = formatFileSize(file.length());
+                item.setExt( sp.length > 1 ? sp[sp.length - 1] : "?");
+                item.setSubtitle(formatFileSize(file.length()));
                 fname = fname.toLowerCase();
                 if (fname.endsWith(".jpg") || fname.endsWith(".png")
                         || fname.endsWith(".gif") || fname.endsWith(".jpeg")) {
-                    item.icon=R.drawable.foto;
+                    item.setIcon(R.drawable.foto);
                 }
 
 
                 if(fname.endsWith(".mp3") || (fname.endsWith(".amr")))
-                {item.icon=R.drawable.music;}
+                {item.setIcon(R.drawable.music);}
                 if(fname.endsWith(".zip") || (fname.endsWith(".rar")))
-                {item.icon=R.drawable.zip;}
+                {item.setIcon(R.drawable.zip);}
                 if(fname.endsWith(".docx"))
-                {item.icon=R.drawable.word;}
+                {item.setIcon(R.drawable.word);}
                 if(fname.endsWith(".mp4")|| (fname.endsWith(".mpg")) || (fname.endsWith(".avi")) || (fname.endsWith(".3gp")))
-                {item.icon=R.drawable.video;}
+                {item.setIcon(R.drawable.video);}
                 if(fname.endsWith(".pdf"))
-                {item.icon=R.drawable.pdf;}
+                {item.setIcon(R.drawable.pdf);}
             }
 
 
@@ -476,10 +476,10 @@ public class DirectoryFragment extends Fragment {
             items.add(item);
         }
         ListItem item = new ListItem();
-        item.title = "Go Back";
-        item.subtitle = "Folder";
-        item.icon = R.drawable.back;
-        item.file = null;
+        item.setTitle("Go Back");
+        item.setSubtitle("Folder");
+        item.setIcon( R.drawable.back);
+        item.setFile(null);
         items.add(0, item);
         clearDrawableAnimation(listView);
         // scrolling = true;
