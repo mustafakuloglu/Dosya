@@ -5,6 +5,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -18,16 +20,29 @@ public class MainActivity extends AppCompatActivity {
     private FragmentManager fragmentManager = null;
     private FragmentTransaction fragmentTransaction = null;
     private DirectoryFragment mDirectoryFragment;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        View.OnClickListener mCorkyListener = new View.OnClickListener() {
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "basıldı", Toast.LENGTH_SHORT).show();
+            }
+        };
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
         toolbar.setTitle("Directory");
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            Toast.makeText(getApplicationContext(), "basıldı", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+        );
+
+
         setSupportActionBar(toolbar);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 

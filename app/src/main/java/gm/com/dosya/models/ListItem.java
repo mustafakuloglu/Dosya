@@ -8,7 +8,12 @@ import java.io.File;
 
 public class ListItem {
 
-    public int icon;
+    private String title;
+    private String subtitle = "";
+    private String ext = "";
+    private String thumb;
+    private File file;
+    private int icon;
 
     public int getIcon() {
         return icon;
@@ -58,10 +63,6 @@ public class ListItem {
         this.file = file;
     }
 
-    public String title;
-    public String subtitle = "";
-    public String ext = "";
-    public String thumb;
-    public File file;
+
 
 }

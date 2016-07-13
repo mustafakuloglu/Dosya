@@ -54,7 +54,7 @@ public class BaseFragmentAdapter extends BaseAdapter {
     }
 
     public int getItemViewType(int pos) {
-        return liste.get(pos).subtitle.length() > 0 ? 0 : 1;
+        return liste.get(pos).getSubtitle().length() > 0 ? 0 : 1;
     }
 
     @Override
