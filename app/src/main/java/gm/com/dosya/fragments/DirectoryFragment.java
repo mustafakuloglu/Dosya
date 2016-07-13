@@ -57,9 +57,10 @@ public class DirectoryFragment extends Fragment {
     private ArrayList<HistoryEntry> history = new ArrayList<HistoryEntry>();
     private HashMap<String, ListItem> selectedFiles = new HashMap<String, ListItem>();
     private long sizeLimit = 1024 * 1024 * 1024;
+    public String silinecek = null;
 
     private String[] chhosefileType = {".pdf", ".doc", ".docx", ".DOC", ".DOCX"};
-
+    File[] files = null;
     private class HistoryEntry {
         int scrollItem, scrollOffset;
         File dir;
@@ -173,6 +174,17 @@ public class DirectoryFragment extends Fragment {
             listView = (ListView) fragmentView.findViewById(R.id.listView);
             listView.setEmptyView(emptyView);
             listView.setAdapter(baseAdapter);
+            listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+               {
+
+                          @Override
+           public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                   silinecek=items.get(position).getThumb();
+
+                           return false;
+                   }
+           });
+
             registerForContextMenu(listView);
 
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -366,7 +378,7 @@ public class DirectoryFragment extends Fragment {
             return false;
         }
         emptyView.setText("NoFiles");
-        File[] files = null;
+
         try {
             files = dir.listFiles();
         } catch (Exception e) {
@@ -394,12 +406,14 @@ public class DirectoryFragment extends Fragment {
             }
         });
         for (File file : files) {
+
             if (file.getName().startsWith(".")||file.getName().endsWith(".dm")) {
                 continue;
             }
             ListItem item = new ListItem();
             item.setTitle(file.getName());  ;
             item.setFile(file);
+            item.setThumb(file.getAbsolutePath());
             if (file.isDirectory()) {
                 item.setIcon(R.drawable.ic_directory);
                 item.setSubtitle("Folder");
@@ -411,6 +425,7 @@ public class DirectoryFragment extends Fragment {
                 fname = fname.toLowerCase();
                 if (fname.endsWith(".jpg") || fname.endsWith(".png")
                         || fname.endsWith(".gif") || fname.endsWith(".jpeg")) {
+                    item.setThumb(file.getAbsolutePath());
                     item.setIcon(R.drawable.foto);
                 }
 
@@ -591,18 +606,21 @@ public void onCreateContextMenu(ContextMenu menu, View v,
         menu.add(0, v.getId(), 0, "Sil");
    }
         @Override
-        public boolean onContextItemSelected(final MenuItem item) {
+        public boolean onContextItemSelected(final MenuItem itemr) {
     // TODO Auto-generated method stub
             int position;
 
-            if (item.getTitle() == "Sil") {
-            final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
+            if (itemr.getTitle() == "Sil") {
+            final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) itemr
                           .getMenuInfo();
             position = (int) info.id;
-            items.remove(position);
+
+                File sil = new File(silinecek);
+                boolean deleted= sil.delete();
+                items.remove(position);
             baseAdapter.notifyDataSetChanged();
      }
-              return super.onContextItemSelected(item);
+              return super.onContextItemSelected(itemr);
           }
 
 }
