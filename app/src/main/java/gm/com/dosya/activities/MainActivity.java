@@ -1,10 +1,14 @@
 package gm.com.dosya.activities;
 
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -20,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private FragmentManager fragmentManager = null;
     private FragmentTransaction fragmentTransaction = null;
     private DirectoryFragment mDirectoryFragment;
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,11 +38,11 @@ public class MainActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
         toolbar.setTitle("Directory");
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View view) {
-                                            Toast.makeText(getApplicationContext(), "basıldı", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
+                                                 @Override
+                                                 public void onClick(View view) {
+                                                     Toast.makeText(getApplicationContext(), "basıldı", Toast.LENGTH_SHORT).show();
+                                                 }
+                                             }
         );
 
 
@@ -87,4 +92,24 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menum, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId())
+        {
+            case android.R.id.home:   Toast.makeText(getApplicationContext(), "basıldı", Toast.LENGTH_SHORT).show();
+            case R.id.action_settings:
+                Toast.makeText(getApplicationContext(), "İşlem1'e tıklandı.", Toast.LENGTH_LONG).show();
+                break;
+        }
+
+
+        return true;
+    }
 }

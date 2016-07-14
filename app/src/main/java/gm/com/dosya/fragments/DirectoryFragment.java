@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Base64;
 import android.util.Log;
@@ -24,13 +25,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -49,7 +55,7 @@ public class DirectoryFragment extends Fragment {
     private ListView listView;
     private BaseFragmentAdapter baseAdapter;
     private TextView emptyView;
-
+    Button yapis;
     private DocumentSelectActivityDelegate delegate;
 
     private static String title_ = "";
@@ -57,11 +63,16 @@ public class DirectoryFragment extends Fragment {
     private ArrayList<HistoryEntry> history = new ArrayList<HistoryEntry>();
     private HashMap<String, ListItem> selectedFiles = new HashMap<String, ListItem>();
     private long sizeLimit = 1024 * 1024 * 1024;
+    public String ilkelPath = null;
+    String copyPath=null;
+    String ana=null;
+    String targetPath=null;
+
+
+    boolean cpy=false;
 
     private String[] chhosefileType = {".pdf", ".doc", ".docx", ".DOC", ".DOCX"};
-
-
-
+    File[] files = null;
     private class HistoryEntry {
         int scrollItem, scrollOffset;
         File dir;
@@ -146,8 +157,6 @@ public class DirectoryFragment extends Fragment {
 
 
 
-
-
         if (!receiverRegistered) {
             receiverRegistered = true;
             IntentFilter filter = new IntentFilter();
@@ -179,7 +188,19 @@ public class DirectoryFragment extends Fragment {
             listView = (ListView) fragmentView.findViewById(R.id.listView);
             listView.setEmptyView(emptyView);
             listView.setAdapter(baseAdapter);
-         
+            listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+            {
+
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                    ilkelPath =items.get(position).getThumb();
+                    ana=items.get(position).getTitle();
+
+
+                    return false;
+                }
+            });
+
             registerForContextMenu(listView);
 
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -245,43 +266,7 @@ public class DirectoryFragment extends Fragment {
             }
         }
         return fragmentView;
-
-
-
     }
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-                                    ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        menu.setHeaderTitle("Context Menu");
-        menu.add(0, v.getId(), 0, "Kopyala");
-        menu.add(0, v.getId(), 0, "Yapıştır");
-        menu.add(0, v.getId(), 0, "Sil");
-    }
-    @Override
-    public boolean onContextItemSelected(final MenuItem item) {
-        // TODO Auto-generated method stub
-        int position;
-
-        if (item.getTitle() == "Sil") {
-            final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
-                    .getMenuInfo();
-            position = (int) info.id;
-            items.remove(position);
-            baseAdapter.notifyDataSetChanged();
-        }
-        return super.onContextItemSelected(item);
-    }
-
-
-
-
-
-
-
-
-
-
 
     private void listRoots() {
         currentDir = null;
@@ -409,7 +394,7 @@ public class DirectoryFragment extends Fragment {
             return false;
         }
         emptyView.setText("NoFiles");
-        File[] files = null;
+
         try {
             files = dir.listFiles();
         } catch (Exception e) {
@@ -431,18 +416,20 @@ public class DirectoryFragment extends Fragment {
                 return lhs.getName().compareToIgnoreCase(rhs.getName());
                 /*
                  * long lm = lhs.lastModified(); long rm = lhs.lastModified();
-				 * if (lm == rm) { return 0; } else if (lm > rm) { return -1; }
-				 * else { return 1; }
-				 */
+             * if (lm == rm) { return 0; } else if (lm > rm) { return -1; }
+             * else { return 1; }
+             */
             }
         });
         for (File file : files) {
+
             if (file.getName().startsWith(".")||file.getName().endsWith(".dm")) {
                 continue;
             }
             ListItem item = new ListItem();
             item.setTitle(file.getName());  ;
             item.setFile(file);
+            item.setThumb(file.getAbsolutePath());
             if (file.isDirectory()) {
                 item.setIcon(R.drawable.ic_directory);
                 item.setSubtitle("Folder");
@@ -454,6 +441,7 @@ public class DirectoryFragment extends Fragment {
                 fname = fname.toLowerCase();
                 if (fname.endsWith(".jpg") || fname.endsWith(".png")
                         || fname.endsWith(".gif") || fname.endsWith(".jpeg")) {
+                    item.setThumb(file.getAbsolutePath());
                     item.setIcon(R.drawable.foto);
                 }
 
@@ -625,4 +613,140 @@ public class DirectoryFragment extends Fragment {
         return temp;
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.setHeaderTitle("Context Menu");
+        menu.add(0, v.getId(), 0, "Kopyala");
+        menu.add(0, v.getId(), 0, "Sil");
+        if(cpy==true)
+        {
+            menu.add(0, v.getId(), 0, "Yapıştır");
+
+        }
+
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+
+
+    @Override
+    public boolean onContextItemSelected(final MenuItem itemr) {
+        // TODO Auto-generated method stub
+        int position;
+
+        if (itemr.getTitle() == "Sil") {
+            final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) itemr
+                    .getMenuInfo();
+            position = (int) info.id;
+
+            File sil = new File(ilkelPath);
+            boolean deleted= sil.delete();
+            items.remove(position);
+            baseAdapter.notifyDataSetChanged();
+        }
+        if (itemr.getTitle() == "Kopyala")
+        {
+            copyPath=ilkelPath;
+            cpy=true;
+
+        }
+        if (itemr.getTitle() == "Yapıştır")
+        {File control=new File(ilkelPath);
+            if(control.isDirectory())
+            {
+                targetPath =copyPath;
+            }
+            else {
+
+                targetPath=ilkelPath.substring(0,ilkelPath.length()-ana.length());
+            }
+            copyFileOrDirectory(copyPath,targetPath);
+            cpy=false;
+        }
+
+        return super.onContextItemSelected(itemr);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public static void copyFileOrDirectory(String srcDir, String dstDir) {
+
+        try {
+            File src = new File(srcDir);
+            File dst = new File(dstDir, src.getName());
+
+            if (src.isDirectory()) {
+
+                String files[] = src.list();
+                int filesLength = files.length;
+                for (int i = 0; i < filesLength; i++) {
+                    String src1 = (new File(src, files[i]).getPath());
+                    String dst1 = dst.getPath();
+                    copyFileOrDirectory(src1, dst1);
+
+                }
+            } else {
+                copyFile(src, dst);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public static void copyFile(File sourceFile, File destFile) throws IOException {
+        if (!destFile.getParentFile().exists())
+            destFile.getParentFile().mkdirs();
+
+        if (!destFile.exists()) {
+            destFile.createNewFile();
+        }
+
+        FileChannel source = null;
+        FileChannel destination = null;
+
+        try {
+            source = new FileInputStream(sourceFile).getChannel();
+            destination = new FileOutputStream(destFile).getChannel();
+            destination.transferFrom(source, 0, source.size());
+        } finally {
+            if (source != null) {
+                source.close();
+            }
+            if (destination != null) {
+                destination.close();
+            }
+        }
+    }
 }

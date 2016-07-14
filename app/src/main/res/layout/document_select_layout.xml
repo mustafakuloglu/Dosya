@@ -24,4 +24,12 @@
         android:textSize="15dp"
         android:visibility="gone" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Yapıştır"
+        android:id="@+id/yapistir"
+        android:visibility="invisible"
+        android:layout_gravity="right|center_vertical" />
+
 </FrameLayout>
