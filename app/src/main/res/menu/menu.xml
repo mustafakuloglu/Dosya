@@ -3,8 +3,12 @@
 
     <item android:id="@+id/delete"
     android:title="Sil"/>
-    <item android:id="@+id/edit"
-    android:title="Düzenle"/>
+    <item android:id="@+id/copy"
+    android:title="Kopyala"/>
+    <item android:id="@+id/zip"
+        android:title="Zip"/>
+    <item android:id="@+id/duzenle"
+        android:title="Düzenle"/>
 
 
 </menu>

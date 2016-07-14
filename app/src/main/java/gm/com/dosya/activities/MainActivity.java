@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menum, menu);
+        getMenuInflater().inflate(R.menu.menu, menu);
         return true;
     }
 
@@ -104,8 +104,8 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId())
         {
             case android.R.id.home:   Toast.makeText(getApplicationContext(), "basıldı", Toast.LENGTH_SHORT).show();
-            case R.id.action_settings:
-                Toast.makeText(getApplicationContext(), "İşlem1'e tıklandı.", Toast.LENGTH_LONG).show();
+            case R.id.copy:
+                Toast.makeText(getApplicationContext(), "copy'e tıklandı.", Toast.LENGTH_LONG).show();
                 break;
         }
 

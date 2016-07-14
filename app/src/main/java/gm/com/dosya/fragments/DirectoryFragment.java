@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
 import android.util.StateSet;
@@ -65,7 +66,7 @@ public class DirectoryFragment extends Fragment {
     private long sizeLimit = 1024 * 1024 * 1024;
     public String ilkelPath = null;
     String copyPath=null;
-    String ana=null;
+    String itemname =null;
     String targetPath=null;
 
 
@@ -194,7 +195,7 @@ public class DirectoryFragment extends Fragment {
                 @Override
                 public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                     ilkelPath =items.get(position).getThumb();
-                    ana=items.get(position).getTitle();
+                    itemname =items.get(position).getTitle();
 
 
                     return false;
@@ -265,6 +266,8 @@ public class DirectoryFragment extends Fragment {
                 parent.removeView(fragmentView);
             }
         }
+       Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.tool_bar);
+
         return fragmentView;
     }
 
@@ -676,11 +679,11 @@ public class DirectoryFragment extends Fragment {
         {File control=new File(ilkelPath);
             if(control.isDirectory())
             {
-                targetPath =copyPath;
+                targetPath =ilkelPath;
             }
             else {
 
-                targetPath=ilkelPath.substring(0,ilkelPath.length()-ana.length());
+                targetPath=ilkelPath.substring(0,ilkelPath.length()-itemname.length());
             }
             copyFileOrDirectory(copyPath,targetPath);
             cpy=false;
@@ -688,19 +691,6 @@ public class DirectoryFragment extends Fragment {
 
         return super.onContextItemSelected(itemr);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     public static void copyFileOrDirectory(String srcDir, String dstDir) {
 
