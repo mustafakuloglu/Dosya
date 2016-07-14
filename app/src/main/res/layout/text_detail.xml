@@ -2,50 +2,56 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
-        <ImageView
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:paddingTop="5dp"
+        android:id="@+id/imageView"
+        />
 
-            android:paddingTop="5dp"
-            android:id="@+id/imageView"
-            android:src="@drawable/ic_external_storage" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Birinci"
+        android:textSize="16dp"
+        android:layout_marginTop="-30dp"
+        android:layout_marginLeft="-50dp"
+        android:lines="1"
+        android:maxLines="1"
+        android:id="@+id/textView"
+        android:layout_gravity="center_horizontal" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Large Text"
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Large Text"
+        android:layout_marginLeft="-50dp"
+        android:layout_gravity="center_horizontal"
+        android:textSize="13dp"
+        android:lines="1"
+        android:maxLines="1"
+        android:id="@+id/valueTextView" />
 
-            android:layout_gravity="left"
-            android:textSize="13dp"
-            android:lines="1"
-            android:maxLines="1"
-            android:id="@+id/valueTextView"
-            android:layout_marginLeft="36dp"
-            android:layout_marginStart="36dp"
-            android:layout_alignBottom="@+id/imageView"
-            android:layout_toRightOf="@+id/imageView"
-            android:layout_toEndOf="@+id/imageView" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Large Text"
+        android:layout_gravity="center"
+        android:textSize="16dp"
+        android:lines="1"
+        android:textStyle="bold"
+        android:ellipsize="marquee"
+        android:visibility="invisible"
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Birinci"
-            android:textSize="16dp"
 
-            android:lines="1"
-            android:maxLines="1"
-            android:id="@+id/textView"
-            android:layout_gravity="center_horizontal"
-            android:layout_above="@+id/valueTextView"
-            android:layout_alignLeft="@+id/valueTextView"
-            android:layout_alignStart="@+id/valueTextView" />
-    </RelativeLayout>
+
+        android:maxLines="1"
+        android:id="@+id/typeTextView" />
 
 
 </LinearLayout>
