@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
                                                      Toast.makeText(getApplicationContext(), "basıldı", Toast.LENGTH_SHORT).show();
                                                  }
                                              }
+
         );
 
 
