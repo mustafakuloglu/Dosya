@@ -58,6 +58,7 @@ public class DirectoryFragment extends Fragment {
     Button yapis;
     String rename = null;
     String copyPath = null;
+    String  createpath=null;
     String itemname = null;
     String targetPath = null;
     Toolbar toolbar;
@@ -673,7 +674,9 @@ public class DirectoryFragment extends Fragment {
         menu.setHeaderTitle("Context Menu");
         menu.add(0, v.getId(), 0, "Kopyala");
         menu.add(0, v.getId(), 0, "Sil");
+        menu.add(0, v.getId(), 0, "Create Folder");
         menu.add(0, v.getId(), 0, "Düzenle");
+
         if (cpy == true) {
             menu.add(0, v.getId(), 0, "Yapıştır");
 
@@ -723,10 +726,43 @@ public class DirectoryFragment extends Fragment {
                             File konum = new File(sdcard, rename);
                             File yenisim = new File(sdcard, newName);
                             konum.renameTo(yenisim);
+                            File file=new File(String.valueOf(sdcard));
+                            listFiles(file);
                         }
                     }).negativeText("Cancel").show();
 
         }
+
+        if (itemr.getTitle() == "Create Folder")
+        {
+            MaterialDialog builder = new MaterialDialog.Builder(getActivity())
+                    .title("Add Item")
+                    .widgetColor(getResources().getColor(R.color.colorPrimaryDark))
+                    .inputType(InputType.TYPE_CLASS_TEXT)
+                    .input(null,null, new MaterialDialog.InputCallback() {
+                        @Override
+                        public void onInput(MaterialDialog dialog, CharSequence inputs) {
+                            String newfolder = inputs.toString();
+                            createpath=ilkelPath;
+
+                            File folder = new File(createpath +
+                                    File.separator + newfolder);
+                            boolean success = true;
+                            if (!folder.exists()) {
+                                success = folder.mkdir();
+                            }
+                            if (success) {
+                                // Do something on success
+                            } else {
+                                // Do something else on failure
+                            }
+                        }
+                    }).negativeText("Cancel").show();
+
+        }
+
+
+
         if (itemr.getTitle() == "Yapıştır") {
             File control = new File(ilkelPath);
             if (control.isDirectory()) {
