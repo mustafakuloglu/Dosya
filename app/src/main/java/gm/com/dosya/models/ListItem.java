@@ -13,7 +13,22 @@ public class ListItem {
     private String ext = "";
     private String thumb;
     private File file;
+    private boolean visible =false;
+    public boolean select = false;
+    private boolean check =false;
     private int icon;
+
+    public boolean getVisible() {return visible;}
+
+    public void setVisible(boolean visible) {this.visible = visible;}
+
+    public boolean getCheck() {return check;}
+
+    public void setCheck(boolean check) {this.check = check;}
+
+    public boolean getSelect() {return select;}
+
+    public void setSelect(boolean select) {this.select=select;}
 
     public int getIcon() {
         return icon;

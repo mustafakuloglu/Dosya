@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -26,6 +27,9 @@ public class BaseFragmentAdapter extends BaseAdapter {
     Context context;
     ArrayList<ListItem> liste;
     private LayoutInflater mInflater;
+    public CheckBox check;
+
+
     public  BaseFragmentAdapter(Context con,ArrayList<ListItem> list)
     {
         context=con;
@@ -73,8 +77,27 @@ public class BaseFragmentAdapter extends BaseAdapter {
         imageView.setImageResource(item.getIcon());
         textView.setText(item.getTitle());
         valueTextView.setText(item.getSubtitle());
+        check = (CheckBox)  satirView.findViewById(R.id.checkBox);
+        if(item.getVisible())
+        {
+            check.setVisibility(View.VISIBLE);
+
+            if(item.getCheck())
+            {
+                check.setChecked(true);
+
+            }
+            else
+            {
+                check.setChecked(false);
+            }
 
 
+
+        }
+        else{
+            check.setVisibility(View.GONE);
+        }
         return satirView;
     }
 
@@ -84,6 +107,7 @@ public class BaseFragmentAdapter extends BaseAdapter {
             super.unregisterDataSetObserver(observer);
         }
     }
+
 
 
 }

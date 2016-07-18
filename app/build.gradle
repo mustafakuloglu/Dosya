@@ -24,8 +24,9 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:24.0.0'
     compile 'com.android.support:support-v4:24.0.0'
-    compile('com.mikepenz:materialdrawer:5.3.6@aar') {
+    compile('com.mikepenz:materialdrawer:5.3.6@aar')
+            {
         transitive = true
     }
-    compile 'com.afollestad.material-dialogs:core:0.8.6.1'
+    compile 'com.afollestad.material-dialogs:commons:0.8.6.1'
 }

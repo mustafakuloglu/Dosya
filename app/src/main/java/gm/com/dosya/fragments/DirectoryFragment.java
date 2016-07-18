@@ -285,6 +285,14 @@ public class DirectoryFragment extends Fragment {
                     ilkelPath = items.get(position).getThumb();
                     itemname = items.get(position).getTitle();
                     rename = items.get(position).getTitle();
+
+                    for(int count=0;count<items.size();count++) {
+                        items.get(count).setVisible(true);
+                        cpy=true;
+                    }
+                    items.get(position).setCheck(true);
+
+                    baseAdapter.notifyDataSetChanged();
                     return false;
 
                 }
@@ -295,13 +303,13 @@ public class DirectoryFragment extends Fragment {
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view,
-                                        int i, long l) {
+                                        int position, long l) {
+                    if(cpy==false){
 
-
-                    if (i < 0 || i >= items.size()) {
+                    if (position < 0 || position >= items.size()) {
                         return;
                     }
-                    ListItem item = items.get(i);
+                    ListItem item = items.get(position);
                     File file = item.getFile();
                     if (file == null) {
                         HistoryEntry he = history.remove(history.size() - 1);
@@ -346,15 +354,29 @@ public class DirectoryFragment extends Fragment {
                         getActivity().startActivity(pdfOpenintent);
 
                     }
-                    check = (CheckBox) getActivity().findViewById(R.id.checkBox);
-                    check.setVisibility(View.GONE);
+
                     if (history.size() > 0) {
 
                         toolbar.setNavigationIcon(R.drawable.arrow);
 
                     } else {
                         toolbar.setNavigationIcon(R.drawable.back);
+
                     }
+
+                }
+                    else
+                    {
+                     if(items.get(position).getCheck()) {
+                         items.get(position).setCheck(false);
+                     }
+                        else
+                     {
+                         items.get(position).setCheck(true);
+                     }
+                        baseAdapter.notifyDataSetChanged();
+                    }
+
                 }
 
             });
