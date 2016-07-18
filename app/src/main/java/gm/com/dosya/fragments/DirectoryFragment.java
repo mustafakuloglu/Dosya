@@ -33,6 +33,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -61,10 +67,11 @@ public class DirectoryFragment extends Fragment {
     String  createpath=null;
     String itemname = null;
     String targetPath = null;
-    Toolbar toolbar;
+    String renamePath=null;
     CheckBox check;
     boolean cpy = false;
     File[] files = null;
+    Toolbar toolbar;
     private View fragmentView;
     private boolean receiverRegistered = false;
     private File currentDir;
@@ -361,8 +368,8 @@ public class DirectoryFragment extends Fragment {
             }
         }
         toolbar = (Toolbar) getActivity().findViewById(R.id.tool_bar);
-
-
+        new DrawerBuilder().withActivity(getActivity()).build();
+        drawerProcesses();
         return fragmentView;
     }
 
@@ -676,6 +683,7 @@ public class DirectoryFragment extends Fragment {
         menu.add(0, v.getId(), 0, "Sil");
         menu.add(0, v.getId(), 0, "Create Folder");
         menu.add(0, v.getId(), 0, "Düzenle");
+        menu.add(0,v.getId(),  0, "ZipFolder");
 
         if (cpy == true) {
             menu.add(0, v.getId(), 0, "Yapıştır");
@@ -689,93 +697,139 @@ public class DirectoryFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
+    /*
+    public void zip(String _files, String zipFileName) {
+        try {
+            BufferedInputStream origin = null;
+            FileOutputStream dest = new FileOutputStream(zipFileName);
+            ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(
+                    dest));
+            byte data[] = new byte[BUFFER];
 
+            for (int i = 0; i < _files.length; i++) {
+                Log.v("Compress", "Adding: " + _files[i]);
+                FileInputStream fi = new FileInputStream(_files[i]);
+                origin = new BufferedInputStream(fi, BUFFER);
 
+                ZipEntry entry = new ZipEntry(_files[i].substring(_files[i].lastIndexOf("/") + 1));
+                out.putNextEntry(entry);
+                int count;
+
+                while ((count = origin.read(data, 0, BUFFER)) != -1) {
+                    out.write(data, 0, count);
+                }
+                origin.close();
+            }
+
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+*/
     @Override
     public boolean onContextItemSelected(final MenuItem itemr) {
-        // TODO Auto-generated method stub
-        int position;
+            // TODO Auto-generated method stub
+            final int position;
 
-        if (itemr.getTitle() == "Sil") {
-            final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) itemr
-                    .getMenuInfo();
-            position = (int) info.id;
+            if (itemr.getTitle() == "Sil") {
+                final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) itemr
+                        .getMenuInfo();
+                position = (int) info.id;
 
-            File sil = new File(ilkelPath);
-            boolean deleted = sil.delete();
-            items.remove(position);
-            baseAdapter.notifyDataSetChanged();
-        }
-        if (itemr.getTitle() == "Kopyala") {
-            copyPath = ilkelPath;
-            cpy = true;
+                File sil = new File(ilkelPath);
+                boolean deleted = sil.delete();
+                items.remove(position);
 
-        }
-        if (itemr.getTitle() == "Düzenle") {
-
-
-            MaterialDialog builder = new MaterialDialog.Builder(getActivity())
-                    .title("Add Item")
-                    .widgetColor(getResources().getColor(R.color.colorPrimaryDark))
-                    .inputType(InputType.TYPE_CLASS_TEXT)
-                    .input(null,null, new MaterialDialog.InputCallback() {
-                        @Override
-                        public void onInput(MaterialDialog dialog, CharSequence input) {
-                            String newName = input.toString();
-                            File sdcard = Environment.getExternalStorageDirectory();
-                            File konum = new File(sdcard, rename);
-                            File yenisim = new File(sdcard, newName);
-                            konum.renameTo(yenisim);
-                            File file=new File(String.valueOf(sdcard));
-                            listFiles(file);
-                        }
-                    }).negativeText("Cancel").show();
-
-        }
-
-        if (itemr.getTitle() == "Create Folder")
-        {
-            MaterialDialog builder = new MaterialDialog.Builder(getActivity())
-                    .title("Add Item")
-                    .widgetColor(getResources().getColor(R.color.colorPrimaryDark))
-                    .inputType(InputType.TYPE_CLASS_TEXT)
-                    .input(null,null, new MaterialDialog.InputCallback() {
-                        @Override
-                        public void onInput(MaterialDialog dialog, CharSequence inputs) {
-                            String newfolder = inputs.toString();
-                            createpath=ilkelPath;
-
-                            File folder = new File(createpath +
-                                    File.separator + newfolder);
-                            boolean success = true;
-                            if (!folder.exists()) {
-                                success = folder.mkdir();
-                            }
-                            if (success) {
-                                // Do something on success
-                            } else {
-                                // Do something else on failure
-                            }
-                        }
-                    }).negativeText("Cancel").show();
-
-        }
-
-
-
-        if (itemr.getTitle() == "Yapıştır") {
-            File control = new File(ilkelPath);
-            if (control.isDirectory()) {
-                targetPath = ilkelPath;
-            } else {
-
-                targetPath = ilkelPath.substring(0, ilkelPath.length() - itemname.length());
             }
-            copyFileOrDirectory(copyPath, targetPath);
-            cpy = false;
+            if (itemr.getTitle() == "Kopyala") {
+                copyPath = ilkelPath;
+                cpy = true;
+
+            }
+            if (itemr.getTitle() == "Düzenle") {
+
+
+                MaterialDialog builder = new MaterialDialog.Builder(getActivity())
+                        .title("Add Item")
+                        .widgetColor(getResources().getColor(R.color.colorPrimaryDark))
+                        .inputType(InputType.TYPE_CLASS_TEXT)
+                        .input(null,null, new MaterialDialog.InputCallback() {
+                            @Override
+                            public void onInput(MaterialDialog dialog, CharSequence input) {
+                                renamePath=ilkelPath;
+                                String newName = input.toString();
+
+                                File konum = new File(renamePath,rename);
+                                File yenisim = new File(renamePath,newName);
+                                konum.renameTo(yenisim);
+
+                            }
+                        }).negativeText("Cancel").show();
+
+            }
+
+            if (itemr.getTitle() == "Create Folder")
+            {
+                MaterialDialog builder = new MaterialDialog.Builder(getActivity())
+                        .title("Add Item")
+                        .widgetColor(getResources().getColor(R.color.colorPrimaryDark))
+                        .inputType(InputType.TYPE_CLASS_TEXT)
+                        .input(null,null, new MaterialDialog.InputCallback() {
+                            @Override
+                            public void onInput(MaterialDialog dialog, CharSequence inputs) {
+                                String newfolder = inputs.toString();
+                                createpath=ilkelPath;
+
+                                File folder = new File(createpath +
+                                        File.separator + newfolder);
+                                boolean success = true;
+                                if (!folder.exists()) {
+                                    success = folder.mkdir();
+                                }
+                                if (success) {
+                                    // Do something on success
+                                } else {
+                                    // Do something else on failure
+                                }
+                            }
+                        }).negativeText("Cancel").show();
+
+            }
+
+        if (itemr.getTitle() == "ZipFolder")
+        {
+            MaterialDialog builderzip = new MaterialDialog.Builder(getActivity())
+                    .title("Add Item")
+                    .widgetColor(getResources().getColor(R.color.colorPrimaryDark))
+                    .inputType(InputType.TYPE_CLASS_TEXT)
+                    .input(null,null, new MaterialDialog.InputCallback() {
+                        @Override
+                        public void onInput(MaterialDialog dialog, CharSequence inputzip){
+                            String newzipfolder = inputzip.toString();
+                            createpath=ilkelPath;
+                          // zip(c);
+
+                        }
+                    }).negativeText("Cancel").show();
+
         }
 
-        return super.onContextItemSelected(itemr);
+
+            if (itemr.getTitle() == "Yapıştır") {
+                File control = new File(ilkelPath);
+                if (control.isDirectory()) {
+                    targetPath = ilkelPath;
+                } else {
+
+                    targetPath = ilkelPath.substring(0, ilkelPath.length() - itemname.length());
+                }
+                copyFileOrDirectory(copyPath, targetPath);
+                cpy = false;
+            }
+
+        baseAdapter.notifyDataSetChanged();
+            return super.onContextItemSelected(itemr);
     }
 
     public static abstract interface DocumentSelectActivityDelegate {
@@ -793,4 +847,28 @@ public class DirectoryFragment extends Fragment {
     }
 
 
+
+    private void drawerProcesses()
+    {
+        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("item 1");
+        SecondaryDrawerItem item2 = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(2).withName(R.string.app_name);
+        Drawer result = new DrawerBuilder()
+                .withActivity(getActivity())
+                .withToolbar(toolbar)
+                .addDrawerItems(
+                        item1,
+                        new DividerDrawerItem(),
+                        item2,
+                        new SecondaryDrawerItem().withName("string")
+                )
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        return false;
+                    }
+
+                })
+                .build();
+
+    }
 }
