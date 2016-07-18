@@ -55,7 +55,8 @@
             android:layout_alignBottom="@+id/valueTextView"
             android:layout_alignParentEnd="true"
             android:focusable="false"
-            android:focusableInTouchMode="false"/>
+            android:focusableInTouchMode="false"
+            android:clickable="false"/>
     </RelativeLayout>
 
 

@@ -103,9 +103,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public  void  geriTusu(){
 
-    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -120,8 +118,9 @@ public class MainActivity extends AppCompatActivity {
             case android.R.id.home:  onBackPressed();
                 break;
             case R.id.copy:
-                Toast.makeText(getApplicationContext(), "copy'e tıklandı.", Toast.LENGTH_LONG).show();
+
                 break;
+
         }
 
 

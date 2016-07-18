@@ -91,9 +91,6 @@ public class BaseFragmentAdapter extends BaseAdapter {
             {
                 check.setChecked(false);
             }
-
-
-
         }
         else{
             check.setVisibility(View.GONE);

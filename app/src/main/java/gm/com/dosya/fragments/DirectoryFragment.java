@@ -21,6 +21,7 @@ import android.util.Log;
 import android.util.StateSet;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -69,7 +70,7 @@ public class DirectoryFragment extends Fragment {
     String targetPath = null;
     String renamePath=null;
     CheckBox check;
-    boolean cpy = false;
+    boolean cpy = false,paste=false;
     File[] files = null;
     Toolbar toolbar;
     private View fragmentView;
@@ -84,6 +85,8 @@ public class DirectoryFragment extends Fragment {
     private HashMap<String, ListItem> selectedFiles = new HashMap<String, ListItem>();
     private long sizeLimit = 1024 * 1024 * 1024;
     private String[] chhosefileType = {".pdf", ".doc", ".docx", ".DOC", ".DOCX"};
+    private boolean click=true;
+    public ArrayList<String> copyList;
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context arg0, Intent intent) {
@@ -260,6 +263,7 @@ public class DirectoryFragment extends Fragment {
             filter.addDataScheme("file");
             getActivity().registerReceiver(receiver, filter);
         }
+        copyList=new ArrayList<String>();
         if (fragmentView == null) {
             fragmentView = inflater.inflate(R.layout.document_select_layout,
                     container, false);
@@ -286,13 +290,6 @@ public class DirectoryFragment extends Fragment {
                     itemname = items.get(position).getTitle();
                     rename = items.get(position).getTitle();
 
-                    for(int count=0;count<items.size();count++) {
-                        items.get(count).setVisible(true);
-                        cpy=true;
-                    }
-                    items.get(position).setCheck(true);
-
-                    baseAdapter.notifyDataSetChanged();
                     return false;
 
                 }
@@ -304,25 +301,26 @@ public class DirectoryFragment extends Fragment {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view,
                                         int position, long l) {
-                    if(cpy==false){
+                    if(click){
 
                     if (position < 0 || position >= items.size()) {
                         return;
                     }
                     ListItem item = items.get(position);
                     File file = item.getFile();
-                    if (file == null) {
-                        HistoryEntry he = history.remove(history.size() - 1);
-                        title_ = he.title;
-                        updateName(title_);
-                        if (he.dir != null) {
-                            listFiles(he.dir);
-                        } else {
-                            listRoots();
-                        }
-                        listView.setSelectionFromTop(he.scrollItem,
-                                he.scrollOffset);
-                    } else if (file.isDirectory()) {
+//                    if (file == null) {
+//                        HistoryEntry he = history.remove(history.size() - 1);
+//                        title_ = he.title;
+//                        updateName(title_);
+//                        if (he.dir != null) {
+//                            listFiles(he.dir);
+//                        } else {
+//                            listRoots();
+//                        }
+//                        listView.setSelectionFromTop(he.scrollItem,
+//                                he.scrollOffset);
+//                    } else
+                        if (file.isDirectory()) {
                         HistoryEntry he = new HistoryEntry();
                         he.scrollItem = listView.getFirstVisiblePosition();
                         he.scrollOffset = listView.getChildAt(0).getTop();
@@ -369,12 +367,14 @@ public class DirectoryFragment extends Fragment {
                     {
                      if(items.get(position).getCheck()) {
                          items.get(position).setCheck(false);
+                         baseAdapter.notifyDataSetChanged();
                      }
                         else
                      {
                          items.get(position).setCheck(true);
+                         baseAdapter.notifyDataSetChanged();
                      }
-                        baseAdapter.notifyDataSetChanged();
+
                     }
 
                 }
@@ -749,6 +749,45 @@ public class DirectoryFragment extends Fragment {
         }
     }
 */
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+
+        final MenuItem yapistirmenu = menu.findItem(R.id.yapistir);
+        final MenuItem copymenu = menu.findItem(R.id.copy);
+
+        yapistirmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                yapistir();
+                yapistirmenu.setVisible(false);
+                copymenu.setVisible(true);
+                return false;
+            }
+        });
+        copymenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                kopyala();
+                 if(cpy&&copyList.size()>0) {
+                     yapistirmenu.setVisible(true);
+                     for(int count=0;count<items.size();count++) {
+                         items.get(count).setVisible(false);
+                                              }
+                     baseAdapter.notifyDataSetChanged();
+                     click=true;
+                     cpy=false;
+                     copymenu.setVisible(false);
+                 }
+
+                return false;
+            }
+        });
+
+    }
+
     @Override
     public boolean onContextItemSelected(final MenuItem itemr) {
             // TODO Auto-generated method stub
@@ -839,19 +878,32 @@ public class DirectoryFragment extends Fragment {
 
 
             if (itemr.getTitle() == "Yapıştır") {
-                File control = new File(ilkelPath);
-                if (control.isDirectory()) {
-                    targetPath = ilkelPath;
-                } else {
+               for(int count=0;count<items.size();count++)
+                {
+                    if(items.get(count).getCheck())
+                    {
+                       copyPath=items.get(count).getThumb();
 
-                    targetPath = ilkelPath.substring(0, ilkelPath.length() - itemname.length());
+                        File control = new File(ilkelPath);
+                        if (control.isDirectory()) {
+                            targetPath = ilkelPath;
+                        } else {
+
+                            targetPath = ilkelPath.substring(0, ilkelPath.length() - itemname.length());
+                        }
+                        copyFileOrDirectory(copyPath, targetPath);
+                        cpy = false;
+
+
+                    }
                 }
-                copyFileOrDirectory(copyPath, targetPath);
-                cpy = false;
+
             }
 
         baseAdapter.notifyDataSetChanged();
             return super.onContextItemSelected(itemr);
+
+
     }
 
     public static abstract interface DocumentSelectActivityDelegate {
@@ -893,4 +945,49 @@ public class DirectoryFragment extends Fragment {
                 .build();
 
     }
+
+    private void kopyala()
+    {
+        if(cpy){
+        for(int count=0;count<items.size();count++)
+        {
+            if(items.get(count).getCheck())
+            {
+                copyList.add(items.get(count).getThumb());
+            }
+
+        }
+            if(copyList.size()>0)
+        {
+            //kopyalama işlemleri yapılacak yani yapıştır çağırılacak
+        }
+        else
+        {
+            showErrorBox("Lütfen kopyalanacak dosya veya klasör seçiniz.");
+        }
+        }
+        else
+        {
+            cpy=true;
+            click=false;
+            for(int count=0;count<items.size();count++) {
+                items.get(count).setVisible(true);
+                cpy=true;
+            }
+
+            baseAdapter.notifyDataSetChanged();
+        }
+    }
+    private void yapistir()
+    {
+       paste=true;
+
+        for(int count=0;count<copyList.size();count++)
+        {
+            copyFileOrDirectory(copyList.get(count),currentDir.getAbsolutePath());
+        }
+
+
+    }
+
 }

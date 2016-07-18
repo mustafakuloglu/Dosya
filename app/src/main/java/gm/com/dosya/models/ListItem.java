@@ -11,10 +11,9 @@ public class ListItem {
     private String title;
     private String subtitle = "";
     private String ext = "";
-    private String thumb;
+    private String thumb="";
     private File file;
     private boolean visible =false;
-    public boolean select = false;
     private boolean check =false;
     private int icon;
 
@@ -25,10 +24,6 @@ public class ListItem {
     public boolean getCheck() {return check;}
 
     public void setCheck(boolean check) {this.check = check;}
-
-    public boolean getSelect() {return select;}
-
-    public void setSelect(boolean select) {this.select=select;}
 
     public int getIcon() {
         return icon;
