@@ -322,18 +322,7 @@ if(history.size()==0)
                     }
                     ListItem item = items.get(position);
                     File file = item.getFile();
-//                    if (file == null) {
-//                        HistoryEntry he = history.remove(history.size() - 1);
-//                        title_ = he.title;
-//                        updateName(title_);
-//                        if (he.dir != null) {
-//                            listFiles(he.dir);
-//                        } else {
-//                            listRoots();
-//                        }
-//                        listView.setSelectionFromTop(he.scrollItem,
-//                                he.scrollOffset);
-//                    } else
+
                         if (file.isDirectory()) {
                         HistoryEntry he = new HistoryEntry();
                         he.scrollItem = listView.getFirstVisiblePosition();
@@ -614,14 +603,7 @@ if(history.size()==0)
 
             items.add(item);
         }
-        ListItem item = new ListItem();
-        item.setTitle("Go Back");
-        item.setSubtitle("Folder");
-        item.setIcon(R.drawable.back);
-        item.setFile(null);
-        items.add(0, item);
-        clearDrawableAnimation(listView);
-        // scrolling = true;
+
         baseAdapter.notifyDataSetChanged();
         return true;
     }
