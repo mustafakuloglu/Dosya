@@ -13,6 +13,7 @@ import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Base64;
 import android.util.Log;
 import android.util.StateSet;
@@ -29,6 +30,7 @@ import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
@@ -65,6 +67,7 @@ public class DirectoryFragment extends Fragment {
     String targetPath = null;
     String renamePath = null;
     String silPath = null;
+    int counter=0;
     CheckBox check;
     boolean click = true;
     File[] files = null;
@@ -301,8 +304,11 @@ public class DirectoryFragment extends Fragment {
                     } else {
                         if (items.get(position).getCheck()) {
                             items.get(position).setCheck(false);
+                            counter--;
                         } else {
                             items.get(position).setCheck(true);
+                            counter++;
+
                         }
                         baseAdapter.notifyDataSetChanged();
                     }
@@ -549,6 +555,15 @@ public class DirectoryFragment extends Fragment {
         final MenuItem silmenu = menu.findItem(R.id.delete);
         final MenuItem yapistirmenu = menu.findItem(R.id.yapistir);
         final MenuItem copymenu = menu.findItem(R.id.copy);
+        final MenuItem duzenlemenu= menu.findItem(R.id.duzenle);
+
+        if(counter>1)
+        {
+            duzenlemenu.setVisible(false);
+        }
+       if(counter==1||counter==0 ) {
+            duzenlemenu.setVisible(true);
+        }
 
         yapistirmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -583,11 +598,17 @@ public class DirectoryFragment extends Fragment {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 for (int count = 0; count < items.size(); count++) {
-
                     if (items.get(count).getCheck()) {
-                        silPath = items.get(count).getThumb();
-                        File sil = new File(silPath);
-                        boolean deleted = sil.delete();
+                        File cont = new File(items.get(count).getThumb());
+                        FileTransactions.DeleteRecursive(cont);
+//                        if(cont.isDirectory())
+//                        {
+//                            FileTransactions.deleteFileOrDirectory(items.get(count).getThumb());
+//                            FileTransactions.deleteDirectory(FileTransactions.sortDirectory(items.get(count).getThumb()));
+//                        }
+//                     else {
+//                            FileTransactions.deleteFileOrDirectory(items.get(count).getThumb());
+//                        }
                     }
                     items.get(count).setVisible(false);
                 }
@@ -596,6 +617,51 @@ public class DirectoryFragment extends Fragment {
                 return false;
             }
         });
+
+        duzenlemenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                MaterialDialog builder = new MaterialDialog.Builder(getActivity())
+                        .title("Add Item")
+                        .widgetColor(getResources().getColor(R.color.colorPrimaryDark))
+                        .inputType(InputType.TYPE_CLASS_TEXT)
+                        .input(null,null, new MaterialDialog.InputCallback() {
+                            @Override
+                            public void onInput(MaterialDialog dialog, CharSequence input) {
+
+                                for (int count=0;count<items.size();count++)
+                                {
+                                    if(items.get(count).getCheck())
+                                    {   String newname=input.toString();
+                                        renamePath=items.get(count).getTitle();
+                                        File konum =new File(renamePath);
+                                        File yeniisim=new File(konum.getParent(),newname);
+                                        konum.renameTo(yeniisim);
+                                    }
+                                }
+
+                            }
+                        }).negativeText("Cancel").show();
+
+              /*  for (int count = 0; count < items.size(); count++) {
+                    if (items.get(count).getCheck()) {
+                       renamePath = items.get(count).getThumb();
+
+                        File konum = new File(renamePath);
+                        File yenisim = new File(konum.getParent(),"degis");
+                        konum.renameTo(yenisim);
+                        listFiles(currentDir);
+                    }
+                    items.get(count).setVisible(false);
+                }*/
+                click = true;
+                listFiles(currentDir);
+                return false;
+            }
+        });
+
+
+
 
     }
 

@@ -58,5 +58,15 @@ public class FileTransactions {
             }
         }
     }
+    public static void DeleteRecursive(File fileOrDirectory) {
+
+        if (fileOrDirectory.isDirectory())
+            for (File child : fileOrDirectory.listFiles())
+                DeleteRecursive(child);
+
+        fileOrDirectory.delete();
+
+    }
 
 }
+
