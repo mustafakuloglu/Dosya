@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         mDirectoryFragment = new DirectoryFragment();
         mDirectoryFragment.setDelegate(new DocumentSelectActivityDelegate() {
 
-            @Override
+
             public void startDocumentSelectActivity() {
 
             }

@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -13,7 +12,6 @@ import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
-import android.util.Base64;
 import android.util.Log;
 import android.util.StateSet;
 import android.view.LayoutInflater;
@@ -24,8 +22,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -37,7 +33,6 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -55,17 +50,8 @@ import gm.com.dosya.utils.UtilityMethods;
 public class DirectoryFragment extends Fragment {
 
     private static String title_ = "";
-    public String ilkelPath = null;
     public ArrayList<String> copyList;
-    Button yapis;
-    String rename = null;
-    String copyPath = null;
-    String createpath = null;
-    String itemname = null;
-    String targetPath = null;
-    String renamePath = null;
-    String silPath = null;
-    CheckBox check;
+    String ilkelPath = null, rename = null, copyPath = null, createpath = null, itemname = null, targetPath = null, renamePath = null, silPath = null;
     boolean click = true;
     File[] files = null;
     Toolbar toolbar;
@@ -80,8 +66,6 @@ public class DirectoryFragment extends Fragment {
     private DocumentSelectActivityDelegate delegate;
     private ArrayList<ListItem> items = new ArrayList<ListItem>();
     private ArrayList<HistoryEntry> history = new ArrayList<HistoryEntry>();
-    private HashMap<String, ListItem> selectedFiles = new HashMap<String, ListItem>();
-    private long sizeLimit = 1024 * 1024 * 1024;
     private String[] chhosefileType = {".pdf", ".doc", ".docx", ".DOC", ".DOCX"};
     private UtilityMethods util;
     private BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -147,18 +131,10 @@ public class DirectoryFragment extends Fragment {
 
 
     public boolean onBackPressed_() {
-        for (int count = 0; count < items.size(); count++) {
-            items.get(count).setVisible(false);
-        }
-        click = true;
+      backControl();
         if (history.size() > 0) {
             HistoryEntry he = history.remove(history.size() - 1);
-            toolbar.setNavigationIcon(R.drawable.arrow);
-            if (history.size() == 0) {
-                toolbar.setNavigationIcon(R.drawable.back);
-            }
-
-            title_ = he.getTitle();
+              title_ = he.getTitle();
             updateName(title_);
             if (he.getDir() != null) {
                 listFiles(he.getDir());
@@ -527,15 +503,6 @@ public class DirectoryFragment extends Fragment {
     public void finishFragment() {
 
     }
-
-    public String BitMapToString(Bitmap bitmap) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
-        byte[] b = baos.toByteArray();
-        String temp = Base64.encodeToString(b, Base64.DEFAULT);
-        return temp;
-    }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -556,12 +523,14 @@ public class DirectoryFragment extends Fragment {
                 yapistir();
                 yapistirmenu.setVisible(false);
                 copymenu.setVisible(true);
+                copyList.clear();
                 return false;
             }
         });
         copymenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
+
                 kopyala();
                 if (cpy && copyList.size() > 0) {
                     yapistirmenu.setVisible(true);
@@ -583,12 +552,17 @@ public class DirectoryFragment extends Fragment {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 for (int count = 0; count < items.size(); count++) {
-
                     if (items.get(count).getCheck()) {
-                        silPath = items.get(count).getThumb();
-                        File sil = new File(silPath);
-                        boolean deleted = sil.delete();
-                    }
+                        File cont = new File(items.get(count).getThumb());
+                        if(cont.isDirectory())
+                        {
+                            FileTransactions.deleteFileOrDirectory(items.get(count).getThumb());
+                            FileTransactions.deleteDirectory(FileTransactions.sortDirectory(items.get(count).getThumb()));
+                        }
+                     else {
+                            FileTransactions.deleteFileOrDirectory(items.get(count).getThumb());
+                        }
+                        }
                     items.get(count).setVisible(false);
                 }
                 click = true;
@@ -635,11 +609,11 @@ public class DirectoryFragment extends Fragment {
                 if (items.get(count).getCheck()) {
                     copyList.add(items.get(count).getThumb());
                 }
-
             }
             if (copyList.size() > 0) {
-                //kopyalama işlemleri yapılacak yani yapıştır çağırılacak
-            } else {
+
+                }
+            else {
                 showErrorBox("Lütfen kopyalanacak dosya veya klasör seçiniz.");
             }
         } else {
@@ -647,9 +621,7 @@ public class DirectoryFragment extends Fragment {
             click = false;
             for (int count = 0; count < items.size(); count++) {
                 items.get(count).setVisible(true);
-                cpy = true;
             }
-
             baseAdapter.notifyDataSetChanged();
         }
     }
@@ -661,6 +633,7 @@ public class DirectoryFragment extends Fragment {
         for (int count = 0; count < copyList.size(); count++) {
             tran.copyFileOrDirectory(copyList.get(count), currentDir.getAbsolutePath());
         }
+        cpy=false;
         listFiles(currentDir);
 
     }
@@ -669,6 +642,22 @@ public class DirectoryFragment extends Fragment {
         public void didSelectFiles(DirectoryFragment activity, ArrayList<String> files);
 
         public void updateToolBarName(String name);
+    }
+    private void backControl()
+     {
+         cpy=false;
+         copyList.clear();
+         for (int count = 0; count < items.size(); count++) {
+        items.get(count).setVisible(false);
+    }
+        click = true;
+        if (history.size() > 0) {
+            toolbar.setNavigationIcon(R.drawable.arrow);
+            if (history.size() == 1) {
+                toolbar.setNavigationIcon(R.drawable.back);
+            }
+
+        }
     }
 
 }
