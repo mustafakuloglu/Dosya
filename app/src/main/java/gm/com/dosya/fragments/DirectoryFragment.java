@@ -15,11 +15,9 @@ import android.os.StatFs;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
 import android.util.Base64;
 import android.util.Log;
 import android.util.StateSet;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,7 +31,6 @@ import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
@@ -65,28 +62,30 @@ public class DirectoryFragment extends Fragment {
     Button yapis;
     String rename = null;
     String copyPath = null;
-    String  createpath=null;
+    String createpath = null;
     String itemname = null;
     String targetPath = null;
-    String renamePath=null;
+    String renamePath = null;
+    String silPath = null;
     CheckBox check;
-    boolean cpy = false,paste=false;
+    boolean click =true;
     File[] files = null;
     Toolbar toolbar;
+    boolean cpy = false,paste=false;
     private View fragmentView;
     private boolean receiverRegistered = false;
     private File currentDir;
     private ListView listView;
     private BaseFragmentAdapter baseAdapter;
     private TextView emptyView;
+    Drawer result;
     private DocumentSelectActivityDelegate delegate;
     private ArrayList<ListItem> items = new ArrayList<ListItem>();
+    public ArrayList<String> copyList;
     private ArrayList<HistoryEntry> history = new ArrayList<HistoryEntry>();
     private HashMap<String, ListItem> selectedFiles = new HashMap<String, ListItem>();
     private long sizeLimit = 1024 * 1024 * 1024;
     private String[] chhosefileType = {".pdf", ".doc", ".docx", ".DOC", ".DOCX"};
-    private boolean click=true;
-    public ArrayList<String> copyList;
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context arg0, Intent intent) {
@@ -209,8 +208,19 @@ public class DirectoryFragment extends Fragment {
     }
 
     public boolean onBackPressed_() {
+        for(int count=0;count<items.size();count++)
+        {
+            items.get(count).setVisible(false);
+        }
+        click=true;
         if (history.size() > 0) {
             HistoryEntry he = history.remove(history.size() - 1);
+            toolbar.setNavigationIcon(R.drawable.arrow);
+            if(history.size()==0)
+            {
+                toolbar.setNavigationIcon(R.drawable.back);
+            }
+
             title_ = he.title;
             updateName(title_);
             if (he.dir != null) {
@@ -264,6 +274,7 @@ public class DirectoryFragment extends Fragment {
             getActivity().registerReceiver(receiver, filter);
         }
         copyList=new ArrayList<String>();
+
         if (fragmentView == null) {
             fragmentView = inflater.inflate(R.layout.document_select_layout,
                     container, false);
@@ -290,6 +301,15 @@ public class DirectoryFragment extends Fragment {
                     itemname = items.get(position).getTitle();
                     rename = items.get(position).getTitle();
 
+                    for (int count = 0; count < items.size(); count++) {
+                        items.get(count).setVisible(true);
+
+                        cpy = true;
+
+                    }
+
+                    click=false;
+                    baseAdapter.notifyDataSetChanged();
                     return false;
 
                 }
@@ -301,80 +321,66 @@ public class DirectoryFragment extends Fragment {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view,
                                         int position, long l) {
-                    if(click){
-
-                    if (position < 0 || position >= items.size()) {
-                        return;
-                    }
-                    ListItem item = items.get(position);
-                    File file = item.getFile();
-//                    if (file == null) {
-//                        HistoryEntry he = history.remove(history.size() - 1);
-//                        title_ = he.title;
-//                        updateName(title_);
-//                        if (he.dir != null) {
-//                            listFiles(he.dir);
-//                        } else {
-//                            listRoots();
-//                        }
-//                        listView.setSelectionFromTop(he.scrollItem,
-//                                he.scrollOffset);
-//                    } else
-                        if (file.isDirectory()) {
-                        HistoryEntry he = new HistoryEntry();
-                        he.scrollItem = listView.getFirstVisiblePosition();
-                        he.scrollOffset = listView.getChildAt(0).getTop();
-                        he.dir = currentDir;
-                        he.title = title_.toString();
-                        updateName(title_);
-                        if (!listFiles(file)) {
+                    if (click) {
+                            if(history.size()==0)
+                            {
+                                toolbar.setNavigationIcon(R.drawable.arrow);
+                            }
+                        if (position < 0 || position >= items.size()) {
                             return;
                         }
-                        history.add(he);
-                        title_ = item.getTitle();
-                        updateName(title_);
-                        listView.setSelection(0);
-                    } else {
+                        ListItem item = items.get(position);
+                        File file = item.getFile();
 
-                        if (!file.canRead()) {
-                            showErrorBox("Yetkiniz bulunmamaktadır.");
-                            return;
+                         if (file.isDirectory()) {
+                            HistoryEntry he = new HistoryEntry();
+                            he.scrollItem = listView.getFirstVisiblePosition();
+                            he.scrollOffset = listView.getChildAt(0).getTop();
+                            he.dir = currentDir;
+                            he.title = title_.toString();
+                            updateName(title_);
+                            if (!listFiles(file)) {
+                                return;
+                            }
+                            history.add(he);
+                            title_ = item.getTitle();
+                            updateName(title_);
+                            listView.setSelection(0);
+                        } else {
+
+                            if (!file.canRead()) {
+                                showErrorBox("Yetkiniz bulunmamaktadır.");
+                                return;
+                            }
+                            MimeTypeMap myMime = MimeTypeMap.getSingleton();
+                            String mimeType = myMime.getMimeTypeFromExtension(getExtension(file));
+
+                            Uri path = Uri.fromFile(file);
+
+                            Intent pdfOpenintent = new Intent(Intent.ACTION_VIEW);
+                            pdfOpenintent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            pdfOpenintent.setDataAndType(path, mimeType);
+
+                            getActivity().startActivity(pdfOpenintent);
+
                         }
-                        MimeTypeMap myMime = MimeTypeMap.getSingleton();
-                        String mimeType = myMime.getMimeTypeFromExtension(getExtension(file));
 
-                        Uri path = Uri.fromFile(file);
+                        if (history.size() > 0) {
 
-                        Intent pdfOpenintent = new Intent(Intent.ACTION_VIEW);
-                        pdfOpenintent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        pdfOpenintent.setDataAndType(path, mimeType);
+                            toolbar.setNavigationIcon(R.drawable.arrow);
 
-                        getActivity().startActivity(pdfOpenintent);
+                        } else {
+                            toolbar.setNavigationIcon(R.drawable.back);
 
-                    }
-
-                    if (history.size() > 0) {
-
-                        toolbar.setNavigationIcon(R.drawable.arrow);
+                        }
 
                     } else {
-                        toolbar.setNavigationIcon(R.drawable.back);
-
-                    }
-
-                }
-                    else
-                    {
-                     if(items.get(position).getCheck()) {
-                         items.get(position).setCheck(false);
-                         baseAdapter.notifyDataSetChanged();
-                     }
-                        else
-                     {
-                         items.get(position).setCheck(true);
-                         baseAdapter.notifyDataSetChanged();
-                     }
-
+                        if (items.get(position).getCheck()) {
+                            items.get(position).setCheck(false);
+                        } else {
+                            items.get(position).setCheck(true);
+                        }
+                        baseAdapter.notifyDataSetChanged();
                     }
 
                 }
@@ -392,6 +398,18 @@ public class DirectoryFragment extends Fragment {
         toolbar = (Toolbar) getActivity().findViewById(R.id.tool_bar);
         new DrawerBuilder().withActivity(getActivity()).build();
         drawerProcesses();
+
+        View.OnClickListener tool= new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(history.size()>0)
+                { onBackPressed_();}
+                else{
+                   result.openDrawer();
+                }
+            }
+        };
+        toolbar.setNavigationOnClickListener(tool);
         return fragmentView;
     }
 
@@ -594,13 +612,7 @@ public class DirectoryFragment extends Fragment {
 
             items.add(item);
         }
-        ListItem item = new ListItem();
-        item.setTitle("Go Back");
-        item.setSubtitle("Folder");
-        item.setIcon(R.drawable.back);
-        item.setFile(null);
-        items.add(0, item);
-        clearDrawableAnimation(listView);
+
         // scrolling = true;
         baseAdapter.notifyDataSetChanged();
         return true;
@@ -697,64 +709,16 @@ public class DirectoryFragment extends Fragment {
     }
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-                                    ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        menu.setHeaderTitle("Context Menu");
-        menu.add(0, v.getId(), 0, "Kopyala");
-        menu.add(0, v.getId(), 0, "Sil");
-        menu.add(0, v.getId(), 0, "Create Folder");
-        menu.add(0, v.getId(), 0, "Düzenle");
-        menu.add(0,v.getId(),  0, "ZipFolder");
-
-        if (cpy == true) {
-            menu.add(0, v.getId(), 0, "Yapıştır");
-
-        }
-
-    }
-
-    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
-    /*
-    public void zip(String _files, String zipFileName) {
-        try {
-            BufferedInputStream origin = null;
-            FileOutputStream dest = new FileOutputStream(zipFileName);
-            ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(
-                    dest));
-            byte data[] = new byte[BUFFER];
-
-            for (int i = 0; i < _files.length; i++) {
-                Log.v("Compress", "Adding: " + _files[i]);
-                FileInputStream fi = new FileInputStream(_files[i]);
-                origin = new BufferedInputStream(fi, BUFFER);
-
-                ZipEntry entry = new ZipEntry(_files[i].substring(_files[i].lastIndexOf("/") + 1));
-                out.putNextEntry(entry);
-                int count;
-
-                while ((count = origin.read(data, 0, BUFFER)) != -1) {
-                    out.write(data, 0, count);
-                }
-                origin.close();
-            }
-
-            out.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-*/
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
-
+        final MenuItem silmenu = menu.findItem(R.id.delete);
         final MenuItem yapistirmenu = menu.findItem(R.id.yapistir);
         final MenuItem copymenu = menu.findItem(R.id.copy);
 
@@ -771,140 +735,42 @@ public class DirectoryFragment extends Fragment {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 kopyala();
-                 if(cpy&&copyList.size()>0) {
-                     yapistirmenu.setVisible(true);
-                     for(int count=0;count<items.size();count++) {
-                         items.get(count).setVisible(false);
-                                              }
-                     baseAdapter.notifyDataSetChanged();
-                     click=true;
-                     cpy=false;
-                     copymenu.setVisible(false);
-                 }
+                if(cpy&&copyList.size()>0) {
+                    yapistirmenu.setVisible(true);
+                    for(int count=0;count<items.size();count++) {
+                        items.get(count).setVisible(false);
+                    }
+                    baseAdapter.notifyDataSetChanged();
+                    click=true;
+                    cpy=false;
+                    copymenu.setVisible(false);
+                }
 
+                return false;
+            }
+        });
+
+
+        silmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                for (int count = 0; count < items.size(); count++) {
+
+                    if (items.get(count).getCheck()) {
+                        silPath = items.get(count).getThumb();
+                        File sil = new File(silPath);
+                        boolean deleted = sil.delete();
+                    }
+                    items.get(count).setVisible(false);
+                }
+                click=true;
+                listFiles(currentDir);
                 return false;
             }
         });
 
     }
 
-    @Override
-    public boolean onContextItemSelected(final MenuItem itemr) {
-            // TODO Auto-generated method stub
-            final int position;
-
-            if (itemr.getTitle() == "Sil") {
-                final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) itemr
-                        .getMenuInfo();
-                position = (int) info.id;
-
-                File sil = new File(ilkelPath);
-                boolean deleted = sil.delete();
-                items.remove(position);
-
-            }
-            if (itemr.getTitle() == "Kopyala") {
-                copyPath = ilkelPath;
-                cpy = true;
-
-            }
-            if (itemr.getTitle() == "Düzenle") {
-
-
-                MaterialDialog builder = new MaterialDialog.Builder(getActivity())
-                        .title("Add Item")
-                        .widgetColor(getResources().getColor(R.color.colorPrimaryDark))
-                        .inputType(InputType.TYPE_CLASS_TEXT)
-                        .input(null,null, new MaterialDialog.InputCallback() {
-                            @Override
-                            public void onInput(MaterialDialog dialog, CharSequence input) {
-                                renamePath=ilkelPath;
-                                String newName = input.toString();
-
-                                File konum = new File(renamePath,rename);
-                                File yenisim = new File(renamePath,newName);
-                                konum.renameTo(yenisim);
-
-                            }
-                        }).negativeText("Cancel").show();
-
-            }
-
-            if (itemr.getTitle() == "Create Folder")
-            {
-                MaterialDialog builder = new MaterialDialog.Builder(getActivity())
-                        .title("Add Item")
-                        .widgetColor(getResources().getColor(R.color.colorPrimaryDark))
-                        .inputType(InputType.TYPE_CLASS_TEXT)
-                        .input(null,null, new MaterialDialog.InputCallback() {
-                            @Override
-                            public void onInput(MaterialDialog dialog, CharSequence inputs) {
-                                String newfolder = inputs.toString();
-                                createpath=ilkelPath;
-
-                                File folder = new File(createpath +
-                                        File.separator + newfolder);
-                                boolean success = true;
-                                if (!folder.exists()) {
-                                    success = folder.mkdir();
-                                }
-                                if (success) {
-                                    // Do something on success
-                                } else {
-                                    // Do something else on failure
-                                }
-                            }
-                        }).negativeText("Cancel").show();
-
-            }
-
-        if (itemr.getTitle() == "ZipFolder")
-        {
-            MaterialDialog builderzip = new MaterialDialog.Builder(getActivity())
-                    .title("Add Item")
-                    .widgetColor(getResources().getColor(R.color.colorPrimaryDark))
-                    .inputType(InputType.TYPE_CLASS_TEXT)
-                    .input(null,null, new MaterialDialog.InputCallback() {
-                        @Override
-                        public void onInput(MaterialDialog dialog, CharSequence inputzip){
-                            String newzipfolder = inputzip.toString();
-                            createpath=ilkelPath;
-                          // zip(c);
-
-                        }
-                    }).negativeText("Cancel").show();
-
-        }
-
-
-            if (itemr.getTitle() == "Yapıştır") {
-               for(int count=0;count<items.size();count++)
-                {
-                    if(items.get(count).getCheck())
-                    {
-                       copyPath=items.get(count).getThumb();
-
-                        File control = new File(ilkelPath);
-                        if (control.isDirectory()) {
-                            targetPath = ilkelPath;
-                        } else {
-
-                            targetPath = ilkelPath.substring(0, ilkelPath.length() - itemname.length());
-                        }
-                        copyFileOrDirectory(copyPath, targetPath);
-                        cpy = false;
-
-
-                    }
-                }
-
-            }
-
-        baseAdapter.notifyDataSetChanged();
-            return super.onContextItemSelected(itemr);
-
-
-    }
 
     public static abstract interface DocumentSelectActivityDelegate {
         public void didSelectFiles(DirectoryFragment activity, ArrayList<String> files);
@@ -921,12 +787,11 @@ public class DirectoryFragment extends Fragment {
     }
 
 
-
-    private void drawerProcesses()
-    {
+    private void drawerProcesses() {
         PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("item 1");
         SecondaryDrawerItem item2 = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(2).withName(R.string.app_name);
-        Drawer result = new DrawerBuilder()
+       result = new DrawerBuilder()
+
                 .withActivity(getActivity())
                 .withToolbar(toolbar)
                 .addDrawerItems(
@@ -945,26 +810,25 @@ public class DirectoryFragment extends Fragment {
                 .build();
 
     }
-
-    private void kopyala()
+private void kopyala()
     {
         if(cpy){
-        for(int count=0;count<items.size();count++)
-        {
-            if(items.get(count).getCheck())
+            for(int count=0;count<items.size();count++)
             {
-                copyList.add(items.get(count).getThumb());
-            }
+                if(items.get(count).getCheck())
+                {
+                    copyList.add(items.get(count).getThumb());
+                }
 
-        }
+            }
             if(copyList.size()>0)
-        {
-            //kopyalama işlemleri yapılacak yani yapıştır çağırılacak
-        }
-        else
-        {
-            showErrorBox("Lütfen kopyalanacak dosya veya klasör seçiniz.");
-        }
+            {
+                //kopyalama işlemleri yapılacak yani yapıştır çağırılacak
+            }
+            else
+            {
+                showErrorBox("Lütfen kopyalanacak dosya veya klasör seçiniz.");
+            }
         }
         else
         {
@@ -980,13 +844,13 @@ public class DirectoryFragment extends Fragment {
     }
     private void yapistir()
     {
-       paste=true;
+        paste=true;
 
         for(int count=0;count<copyList.size();count++)
         {
             copyFileOrDirectory(copyList.get(count),currentDir.getAbsolutePath());
         }
-
+    listFiles(currentDir);
 
     }
 
