@@ -627,63 +627,6 @@ public class DirectoryFragment extends Fragment {
                 .setMessage(error).setPositiveButton("OK", null).show();
     }
 
-//    private class ListAdapter extends BaseFragmentAdapter {
-//        private Context mContext;
-//
-//        public ListAdapter(Context context) {
-//            mContext = context;
-//        }
-//
-//        @Override
-//        public int getCount() {
-//            return items.size();
-//        }
-//
-//        @Override
-//        public Object getItem(int position) {
-//            return items.get(position);
-//        }
-//
-//        @Override
-//        public long getItemId(int position) {
-//            return 0;
-//        }
-//
-//        public int getViewTypeCount() {
-//            return 2;
-//        }
-//
-//        public int getItemViewType(int pos) {
-//            return items.get(pos).subtitle.length() > 0 ? 0 : 1;
-//        }
-//
-//        @Override
-//        public View getView(int position, View convertView, ViewGroup parent) {
-//            if (convertView == null) {
-//                convertView = new TextDetailDocumentsCell(mContext);
-//            }
-//            TextDetailDocumentsCell textDetailCell = (TextDetailDocumentsCell) convertView;
-//            ListItem item = items.get(position);
-//            if (item.icon != 0) {
-//                ((TextDetailDocumentsCell) convertView)
-//                        .setTextAndValueAndTypeAndThumb(item.title,
-//                                item.subtitle, null, null, item.icon,getActivity().getContentResolver());
-//            } else {
-//                String type = item.ext.toUpperCase().substring(0,
-//                        Math.min(item.ext.length(), 4));
-//                ((TextDetailDocumentsCell) convertView)
-//                        .setTextAndValueAndTypeAndThumb(item.title,
-//                                item.subtitle, type, item.thumb, 0,getActivity().getContentResolver());
-//            }
-//            // if (item.file != null && actionBar.isActionModeShowed()) {
-//            // textDetailCell.setChecked(selectedFiles.containsKey(item.file.toString()),
-//            // !scrolling);
-//            // } else {
-//            // textDetailCell.setChecked(false, !scrolling);
-//            // }
-//            return convertView;
-//        }
-//    }
 
     private String getRootSubtitle(String path) {
         StatFs stat = new StatFs(path);
