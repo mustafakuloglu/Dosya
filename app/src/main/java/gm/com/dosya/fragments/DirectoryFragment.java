@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -57,6 +56,7 @@ public class DirectoryFragment extends Fragment {
 
     private static String title_ = "";
     public String ilkelPath = null;
+    public ArrayList<String> copyList;
     Button yapis;
     String rename = null;
     String copyPath = null;
@@ -66,20 +66,19 @@ public class DirectoryFragment extends Fragment {
     String renamePath = null;
     String silPath = null;
     CheckBox check;
-    boolean click =true;
+    boolean click = true;
     File[] files = null;
     Toolbar toolbar;
-    boolean cpy = false,paste=false;
+    boolean cpy = false, paste = false;
+    Drawer result;
     private View fragmentView;
     private boolean receiverRegistered = false;
     private File currentDir;
     private ListView listView;
     private BaseFragmentAdapter baseAdapter;
     private TextView emptyView;
-    Drawer result;
     private DocumentSelectActivityDelegate delegate;
     private ArrayList<ListItem> items = new ArrayList<ListItem>();
-    public ArrayList<String> copyList;
     private ArrayList<HistoryEntry> history = new ArrayList<HistoryEntry>();
     private HashMap<String, ListItem> selectedFiles = new HashMap<String, ListItem>();
     private long sizeLimit = 1024 * 1024 * 1024;
@@ -108,7 +107,6 @@ public class DirectoryFragment extends Fragment {
             }
         }
     };
-
 
 
     public static void clearDrawableAnimation(View view) {
@@ -149,16 +147,14 @@ public class DirectoryFragment extends Fragment {
 
 
     public boolean onBackPressed_() {
-        for(int count=0;count<items.size();count++)
-        {
+        for (int count = 0; count < items.size(); count++) {
             items.get(count).setVisible(false);
         }
-        click=true;
+        click = true;
         if (history.size() > 0) {
             HistoryEntry he = history.remove(history.size() - 1);
             toolbar.setNavigationIcon(R.drawable.arrow);
-            if(history.size()==0)
-            {
+            if (history.size() == 0) {
                 toolbar.setNavigationIcon(R.drawable.back);
             }
 
@@ -202,20 +198,10 @@ public class DirectoryFragment extends Fragment {
         util = new UtilityMethods();
         if (!receiverRegistered) {
             receiverRegistered = true;
-            IntentFilter filter = new IntentFilter();
-            filter.addAction(Intent.ACTION_MEDIA_BAD_REMOVAL);
-            filter.addAction(Intent.ACTION_MEDIA_CHECKING);
-            filter.addAction(Intent.ACTION_MEDIA_EJECT);
-            filter.addAction(Intent.ACTION_MEDIA_MOUNTED);
-            filter.addAction(Intent.ACTION_MEDIA_NOFS);
-            filter.addAction(Intent.ACTION_MEDIA_REMOVED);
-            filter.addAction(Intent.ACTION_MEDIA_SHARED);
-            filter.addAction(Intent.ACTION_MEDIA_UNMOUNTABLE);
-            filter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
-            filter.addDataScheme("file");
-            getActivity().registerReceiver(receiver, filter);
+
+            getActivity().registerReceiver(receiver, util.getIntent());
         }
-        copyList=new ArrayList<String>();
+        copyList = new ArrayList<String>();
 
         if (fragmentView == null) {
             fragmentView = inflater.inflate(R.layout.document_select_layout,
@@ -250,7 +236,7 @@ public class DirectoryFragment extends Fragment {
 
                     }
 
-                    click=false;
+                    click = false;
                     baseAdapter.notifyDataSetChanged();
                     return false;
 
@@ -264,17 +250,16 @@ public class DirectoryFragment extends Fragment {
                 public void onItemClick(AdapterView<?> adapterView, View view,
                                         int position, long l) {
                     if (click) {
-                            if(history.size()==0)
-                            {
-                                toolbar.setNavigationIcon(R.drawable.arrow);
-                            }
+                        if (history.size() == 0) {
+                            toolbar.setNavigationIcon(R.drawable.arrow);
+                        }
                         if (position < 0 || position >= items.size()) {
                             return;
                         }
                         ListItem item = items.get(position);
                         File file = item.getFile();
 
-                         if (file.isDirectory()) {
+                        if (file.isDirectory()) {
                             HistoryEntry he = new HistoryEntry();
                             he.setScrollItem(listView.getFirstVisiblePosition());
                             he.setScrollOffset(listView.getChildAt(0).getTop());
@@ -310,12 +295,9 @@ public class DirectoryFragment extends Fragment {
                         if (history.size() > 0) {
 
                             toolbar.setNavigationIcon(R.drawable.arrow);
-
                         } else {
                             toolbar.setNavigationIcon(R.drawable.back);
-
                         }
-
                     } else {
                         if (items.get(position).getCheck()) {
                             items.get(position).setCheck(false);
@@ -324,12 +306,8 @@ public class DirectoryFragment extends Fragment {
                         }
                         baseAdapter.notifyDataSetChanged();
                     }
-
                 }
-
             });
-
-
             listRoots();
         } else {
             ViewGroup parent = (ViewGroup) fragmentView.getParent();
@@ -340,14 +318,13 @@ public class DirectoryFragment extends Fragment {
         toolbar = (Toolbar) getActivity().findViewById(R.id.tool_bar);
         new DrawerBuilder().withActivity(getActivity()).build();
         drawerProcesses();
-
-        View.OnClickListener tool= new View.OnClickListener() {
+        View.OnClickListener tool = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(history.size()>0)
-                { onBackPressed_();}
-                else{
-                   result.openDrawer();
+                if (history.size() > 0) {
+                    onBackPressed_();
+                } else {
+                    result.openDrawer();
                 }
             }
         };
@@ -433,23 +410,6 @@ public class DirectoryFragment extends Fragment {
         fs.setFile(new File("/"));
         items.add(fs);
 
-        // try {
-        // File telegramPath = new
-        // File(Environment.getExternalStorageDirectory(), "Telegram");
-        // if (telegramPath.exists()) {
-        // fs = new ListItem();
-        // fs.title = "Telegram";
-        // fs.subtitle = telegramPath.toString();
-        // fs.icon = R.drawable.ic_directory;
-        // fs.file = telegramPath;
-        // items.add(fs);
-        // }
-        // } catch (Exception e) {
-        // FileLog.e("tmessages", e);
-        // }
-
-        // AndroidUtilities.clearDrawableAnimation(listView);
-        // scrolling = true;
         baseAdapter.notifyDataSetChanged();
     }
 
@@ -472,7 +432,6 @@ public class DirectoryFragment extends Fragment {
                         emptyView.setText("NotMounted");
                     }
                     clearDrawableAnimation(listView);
-                    // scrolling = true;
                     baseAdapter.notifyDataSetChanged();
                     return true;
                 }
@@ -501,11 +460,6 @@ public class DirectoryFragment extends Fragment {
                     return lhs.isDirectory() ? -1 : 1;
                 }
                 return lhs.getName().compareToIgnoreCase(rhs.getName());
-                /*
-                 * long lm = lhs.lastModified(); long rm = lhs.lastModified();
-             * if (lm == rm) { return 0; } else if (lm > rm) { return -1; }
-             * else { return 1; }
-             */
             }
         });
         for (File file : files) {
@@ -570,7 +524,6 @@ public class DirectoryFragment extends Fragment {
     }
 
 
-
     public void finishFragment() {
 
     }
@@ -610,14 +563,14 @@ public class DirectoryFragment extends Fragment {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 kopyala();
-                if(cpy&&copyList.size()>0) {
+                if (cpy && copyList.size() > 0) {
                     yapistirmenu.setVisible(true);
-                    for(int count=0;count<items.size();count++) {
+                    for (int count = 0; count < items.size(); count++) {
                         items.get(count).setVisible(false);
                     }
                     baseAdapter.notifyDataSetChanged();
-                    click=true;
-                    cpy=false;
+                    click = true;
+                    cpy = false;
                     copymenu.setVisible(false);
                 }
 
@@ -638,7 +591,7 @@ public class DirectoryFragment extends Fragment {
                     }
                     items.get(count).setVisible(false);
                 }
-                click=true;
+                click = true;
                 listFiles(currentDir);
                 return false;
             }
@@ -646,36 +599,22 @@ public class DirectoryFragment extends Fragment {
 
     }
 
-
-    public static abstract interface DocumentSelectActivityDelegate {
-        public void didSelectFiles(DirectoryFragment activity, ArrayList<String> files);
-
-        public void startDocumentSelectActivity();
-
-        public void updateToolBarName(String name);
-    }
-
-
-
-
- private void drawerProcesses()
- {
-         PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("GENERAL MOBİLE");
-         SecondaryDrawerItem item2 = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(2).withName("Galeri");
-         SecondaryDrawerItem item3 = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(3).withName("Cihaz Bilgisi");
-         item1.withIcon(R.drawable.gm);
-         item2.withIcon(R.drawable.galeri);
-         item3.withIcon(R.drawable.info);
-         result = new DrawerBuilder()
+    private void drawerProcesses() {
+        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("GENERAL MOBİLE");
+        SecondaryDrawerItem item2 = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(2).withName("Galeri");
+        SecondaryDrawerItem item3 = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(3).withName("Cihaz Bilgisi");
+        item1.withIcon(R.drawable.gm);
+        item2.withIcon(R.drawable.galeri);
+        item3.withIcon(R.drawable.info);
+        result = new DrawerBuilder()
                 .withActivity(getActivity())
                 .withToolbar(toolbar)
                 .addDrawerItems(
                         item1,
                         new DividerDrawerItem(),
                         item2,
-                             new SecondaryDrawerItem().withName("Dökümanlar").withIcon(R.drawable.documents),
-                             item3
-
+                        new SecondaryDrawerItem().withName("Dökümanlar").withIcon(R.drawable.documents),
+                        item3
 
 
                 )
@@ -689,49 +628,47 @@ public class DirectoryFragment extends Fragment {
                 .build();
 
     }
-private void kopyala()
-    {
-        if(cpy){
-            for(int count=0;count<items.size();count++)
-            {
-                if(items.get(count).getCheck())
-                {
+
+    private void kopyala() {
+        if (cpy) {
+            for (int count = 0; count < items.size(); count++) {
+                if (items.get(count).getCheck()) {
                     copyList.add(items.get(count).getThumb());
                 }
 
             }
-            if(copyList.size()>0)
-            {
+            if (copyList.size() > 0) {
                 //kopyalama işlemleri yapılacak yani yapıştır çağırılacak
-            }
-            else
-            {
+            } else {
                 showErrorBox("Lütfen kopyalanacak dosya veya klasör seçiniz.");
             }
-        }
-        else
-        {
-            cpy=true;
-            click=false;
-            for(int count=0;count<items.size();count++) {
+        } else {
+            cpy = true;
+            click = false;
+            for (int count = 0; count < items.size(); count++) {
                 items.get(count).setVisible(true);
-                cpy=true;
+                cpy = true;
             }
 
             baseAdapter.notifyDataSetChanged();
         }
     }
-    private void yapistir()
-    {
+
+    private void yapistir() {
         FileTransactions tran = new FileTransactions();
-        paste=true;
+        paste = true;
 
-        for(int count=0;count<copyList.size();count++)
-        {
-            tran.copyFileOrDirectory(copyList.get(count),currentDir.getAbsolutePath());
+        for (int count = 0; count < copyList.size(); count++) {
+            tran.copyFileOrDirectory(copyList.get(count), currentDir.getAbsolutePath());
         }
-    listFiles(currentDir);
+        listFiles(currentDir);
 
+    }
+
+    public static abstract interface DocumentSelectActivityDelegate {
+        public void didSelectFiles(DirectoryFragment activity, ArrayList<String> files);
+
+        public void updateToolBarName(String name);
     }
 
 }
