@@ -86,6 +86,7 @@ public class DirectoryFragment extends Fragment {
     private long sizeLimit = 1024 * 1024 * 1024;
     private String[] chhosefileType = {".pdf", ".doc", ".docx", ".DOC", ".DOCX"};
     private boolean click=true;
+    Drawer result;
     public ArrayList<String> copyList;
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -211,6 +212,12 @@ public class DirectoryFragment extends Fragment {
     public boolean onBackPressed_() {
         if (history.size() > 0) {
             HistoryEntry he = history.remove(history.size() - 1);
+
+                toolbar.setNavigationIcon(R.drawable.arrow);
+
+if(history.size()==0)
+{toolbar.setNavigationIcon(R.drawable.back);}
+
             title_ = he.title;
             updateName(title_);
             if (he.dir != null) {
@@ -221,6 +228,8 @@ public class DirectoryFragment extends Fragment {
             listView.setSelectionFromTop(he.scrollItem, he.scrollOffset);
             return false;
         } else {
+
+
             return true;
         }
     }
@@ -302,6 +311,11 @@ public class DirectoryFragment extends Fragment {
                 public void onItemClick(AdapterView<?> adapterView, View view,
                                         int position, long l) {
                     if(click){
+                        if (history.size() == 0) {
+
+                            toolbar.setNavigationIcon(R.drawable.arrow);
+
+                        }
 
                     if (position < 0 || position >= items.size()) {
                         return;
@@ -353,16 +367,11 @@ public class DirectoryFragment extends Fragment {
 
                     }
 
-                    if (history.size() > 0) {
 
-                        toolbar.setNavigationIcon(R.drawable.arrow);
-
-                    } else {
-                        toolbar.setNavigationIcon(R.drawable.back);
-
-                    }
 
                 }
+
+
                     else
                     {
                      if(items.get(position).getCheck()) {
@@ -392,6 +401,17 @@ public class DirectoryFragment extends Fragment {
         toolbar = (Toolbar) getActivity().findViewById(R.id.tool_bar);
         new DrawerBuilder().withActivity(getActivity()).build();
         drawerProcesses();
+
+        View.OnClickListener tool = new View.OnClickListener() {
+            public void onClick(View v) {
+                if(history.size()>0)
+                onBackPressed_();
+                else
+                    result.openDrawer();
+            }
+        };
+        toolbar.setNavigationOnClickListener(tool);
+
         return fragmentView;
     }
 
@@ -926,7 +946,7 @@ public class DirectoryFragment extends Fragment {
     {
         PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("item 1");
         SecondaryDrawerItem item2 = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(2).withName(R.string.app_name);
-        Drawer result = new DrawerBuilder()
+        result = new DrawerBuilder()
                 .withActivity(getActivity())
                 .withToolbar(toolbar)
                 .addDrawerItems(
