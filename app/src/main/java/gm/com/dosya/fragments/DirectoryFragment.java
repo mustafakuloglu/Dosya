@@ -554,14 +554,15 @@ public class DirectoryFragment extends Fragment {
                 for (int count = 0; count < items.size(); count++) {
                     if (items.get(count).getCheck()) {
                         File cont = new File(items.get(count).getThumb());
-                        if(cont.isDirectory())
-                        {
-                            FileTransactions.deleteFileOrDirectory(items.get(count).getThumb());
-                            FileTransactions.deleteDirectory(FileTransactions.sortDirectory(items.get(count).getThumb()));
-                        }
-                     else {
-                            FileTransactions.deleteFileOrDirectory(items.get(count).getThumb());
-                        }
+                        FileTransactions.DeleteRecursive(cont);
+//                        if(cont.isDirectory())
+//                        {
+//                            FileTransactions.deleteFileOrDirectory(items.get(count).getThumb());
+//                            FileTransactions.deleteDirectory(FileTransactions.sortDirectory(items.get(count).getThumb()));
+//                        }
+//                     else {
+//                            FileTransactions.deleteFileOrDirectory(items.get(count).getThumb());
+//                        }
                         }
                     items.get(count).setVisible(false);
                 }
