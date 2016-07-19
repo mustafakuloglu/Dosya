@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.StatFs;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
@@ -41,11 +40,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -53,7 +48,10 @@ import java.util.HashMap;
 
 import gm.com.dosya.R;
 import gm.com.dosya.adapters.BaseFragmentAdapter;
+import gm.com.dosya.models.HistoryEntry;
 import gm.com.dosya.models.ListItem;
+import gm.com.dosya.utils.FileTransactions;
+import gm.com.dosya.utils.UtilityMethods;
 
 public class DirectoryFragment extends Fragment {
 
@@ -86,6 +84,7 @@ public class DirectoryFragment extends Fragment {
     private HashMap<String, ListItem> selectedFiles = new HashMap<String, ListItem>();
     private long sizeLimit = 1024 * 1024 * 1024;
     private String[] chhosefileType = {".pdf", ".doc", ".docx", ".DOC", ".DOCX"};
+    private UtilityMethods util;
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context arg0, Intent intent) {
@@ -110,17 +109,7 @@ public class DirectoryFragment extends Fragment {
         }
     };
 
-    public static String formatFileSize(long size) {
-        if (size < 1024) {
-            return String.format("%d B", size);
-        } else if (size < 1024 * 1024) {
-            return String.format("%.1f KB", size / 1024.0f);
-        } else if (size < 1024 * 1024 * 1024) {
-            return String.format("%.1f MB", size / 1024.0f / 1024.0f);
-        } else {
-            return String.format("%.1f GB", size / 1024.0f / 1024.0f / 1024.0f);
-        }
-    }
+
 
     public static void clearDrawableAnimation(View view) {
         if (Build.VERSION.SDK_INT < 21 || view == null) {
@@ -158,54 +147,6 @@ public class DirectoryFragment extends Fragment {
         return ext;
     }
 
-    public static void copyFileOrDirectory(String srcDir, String dstDir) {
-
-        try {
-            File src = new File(srcDir);
-            File dst = new File(dstDir, src.getName());
-
-            if (src.isDirectory()) {
-
-                String files[] = src.list();
-                int filesLength = files.length;
-                for (int i = 0; i < filesLength; i++) {
-                    String src1 = (new File(src, files[i]).getPath());
-                    String dst1 = dst.getPath();
-                    copyFileOrDirectory(src1, dst1);
-
-                }
-            } else {
-                copyFile(src, dst);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void copyFile(File sourceFile, File destFile) throws IOException {
-        if (!destFile.getParentFile().exists())
-            destFile.getParentFile().mkdirs();
-
-        if (!destFile.exists()) {
-            destFile.createNewFile();
-        }
-
-        FileChannel source = null;
-        FileChannel destination = null;
-
-        try {
-            source = new FileInputStream(sourceFile).getChannel();
-            destination = new FileOutputStream(destFile).getChannel();
-            destination.transferFrom(source, 0, source.size());
-        } finally {
-            if (source != null) {
-                source.close();
-            }
-            if (destination != null) {
-                destination.close();
-            }
-        }
-    }
 
     public boolean onBackPressed_() {
         for(int count=0;count<items.size();count++)
@@ -221,14 +162,14 @@ public class DirectoryFragment extends Fragment {
                 toolbar.setNavigationIcon(R.drawable.back);
             }
 
-            title_ = he.title;
+            title_ = he.getTitle();
             updateName(title_);
-            if (he.dir != null) {
-                listFiles(he.dir);
+            if (he.getDir() != null) {
+                listFiles(he.getDir());
             } else {
                 listRoots();
             }
-            listView.setSelectionFromTop(he.scrollItem, he.scrollOffset);
+            listView.setSelectionFromTop(he.getScrollItem(), he.getScrollOffset());
             return false;
         } else {
             return true;
@@ -258,6 +199,7 @@ public class DirectoryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        util = new UtilityMethods();
         if (!receiverRegistered) {
             receiverRegistered = true;
             IntentFilter filter = new IntentFilter();
@@ -334,10 +276,10 @@ public class DirectoryFragment extends Fragment {
 
                          if (file.isDirectory()) {
                             HistoryEntry he = new HistoryEntry();
-                            he.scrollItem = listView.getFirstVisiblePosition();
-                            he.scrollOffset = listView.getChildAt(0).getTop();
-                            he.dir = currentDir;
-                            he.title = title_.toString();
+                            he.setScrollItem(listView.getFirstVisiblePosition());
+                            he.setScrollOffset(listView.getChildAt(0).getTop());
+                            he.setDir(currentDir);
+                            he.setTitle(title_.toString());
                             updateName(title_);
                             if (!listFiles(file)) {
                                 return;
@@ -433,7 +375,7 @@ public class DirectoryFragment extends Fragment {
                     : R.drawable.ic_storage);
         }
 
-        ext.setSubtitle(getRootSubtitle(extStorage));
+        ext.setSubtitle(util.getRootSubtitle(extStorage));
         ext.setFile(Environment.getExternalStorageDirectory());
         items.add(ext);
         try {
@@ -473,7 +415,7 @@ public class DirectoryFragment extends Fragment {
                         }
                         item.setIcon(R.drawable.ic_external_storage);
                         item.setTitle("Sdcard");
-                        item.setSubtitle(getRootSubtitle(path));
+                        item.setSubtitle(util.getRootSubtitle(path));
                         item.setFile(new File(path));
                         items.add(item);
                     } catch (Exception e) {
@@ -583,7 +525,7 @@ public class DirectoryFragment extends Fragment {
                 String fname = file.getName();
                 String[] sp = fname.split("\\.");
                 item.setExt(sp.length > 1 ? sp[sp.length - 1] : "?");
-                item.setSubtitle(formatFileSize(file.length()));
+                item.setSubtitle(UtilityMethods.formatFileSize(file.length()));
                 fname = fname.toLowerCase();
                 if (fname.endsWith(".jpg") || fname.endsWith(".png")
                         || fname.endsWith(".gif") || fname.endsWith(".jpeg")) {
@@ -613,7 +555,7 @@ public class DirectoryFragment extends Fragment {
             items.add(item);
         }
 
-        // scrolling = true;
+
         baseAdapter.notifyDataSetChanged();
         return true;
     }
@@ -628,16 +570,6 @@ public class DirectoryFragment extends Fragment {
     }
 
 
-    private String getRootSubtitle(String path) {
-        StatFs stat = new StatFs(path);
-        long total = (long) stat.getBlockCount() * (long) stat.getBlockSize();
-        long free = (long) stat.getAvailableBlocks()
-                * (long) stat.getBlockSize();
-        if (total == 0) {
-            return "";
-        }
-        return "Free " + formatFileSize(free) + " of " + formatFileSize(total);
-    }
 
     public void finishFragment() {
 
@@ -723,25 +655,29 @@ public class DirectoryFragment extends Fragment {
         public void updateToolBarName(String name);
     }
 
-    private class HistoryEntry {
-        int scrollItem, scrollOffset;
-        File dir;
-        String title;
-    }
 
 
-    private void drawerProcesses() {
-        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("item 1");
-        SecondaryDrawerItem item2 = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(2).withName(R.string.app_name);
-       result = new DrawerBuilder()
 
+ private void drawerProcesses()
+ {
+         PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("GENERAL MOBİLE");
+         SecondaryDrawerItem item2 = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(2).withName("Galeri");
+         SecondaryDrawerItem item3 = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(3).withName("Cihaz Bilgisi");
+         item1.withIcon(R.drawable.gm);
+         item2.withIcon(R.drawable.galeri);
+         item3.withIcon(R.drawable.info);
+         result = new DrawerBuilder()
                 .withActivity(getActivity())
                 .withToolbar(toolbar)
                 .addDrawerItems(
                         item1,
                         new DividerDrawerItem(),
                         item2,
-                        new SecondaryDrawerItem().withName("string")
+                             new SecondaryDrawerItem().withName("Dökümanlar").withIcon(R.drawable.documents),
+                             item3
+
+
+
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -787,11 +723,12 @@ private void kopyala()
     }
     private void yapistir()
     {
+        FileTransactions tran = new FileTransactions();
         paste=true;
 
         for(int count=0;count<copyList.size();count++)
         {
-            copyFileOrDirectory(copyList.get(count),currentDir.getAbsolutePath());
+            tran.copyFileOrDirectory(copyList.get(count),currentDir.getAbsolutePath());
         }
     listFiles(currentDir);
 
