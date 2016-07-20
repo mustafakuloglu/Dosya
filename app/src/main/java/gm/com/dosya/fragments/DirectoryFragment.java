@@ -559,13 +559,7 @@ public class DirectoryFragment extends Fragment {
         final MenuItem duzenlemenu= menu.findItem(R.id.duzenle);
         final MenuItem tasimenu=menu.findItem(R.id.move);
 
-        if(counter>1)
-        {
-            duzenlemenu.setVisible(false);
-        }
-       if(counter==1||counter==0 ) {
-            duzenlemenu.setVisible(true);
-        }
+
 
         yapistirmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -669,13 +663,13 @@ else {
                                 {
                                     if(items.get(count).getCheck())
                                     {   String newname=input.toString();
-                                        renamePath=items.get(count).getTitle();
+                                        renamePath=items.get(count).getThumb();
                                         File konum =new File(renamePath);
                                         File yeniisim=new File(konum.getParent(),newname);
                                         konum.renameTo(yeniisim);
                                     }
                                 }
-
+                                listFiles(currentDir);
                             }
                         }).negativeText("Cancel").show();
 
@@ -691,7 +685,7 @@ else {
                     items.get(count).setVisible(false);
                 }*/
                 click = true;
-                listFiles(currentDir);
+
                 return false;
             }
         });
@@ -775,6 +769,8 @@ private void kes()
         paste = true;
 
         for (int count = 0; count < copyList.size(); count++) {
+
+
             tran.copyFileOrDirectory(copyList.get(count), currentDir.getAbsolutePath());
         }
 
