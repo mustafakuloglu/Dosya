@@ -70,6 +70,7 @@ public class DirectoryFragment extends Fragment {
     int counter=0;
     CheckBox check;
     boolean click = true;
+    boolean tasi=false;
     File[] files = null;
     Toolbar toolbar;
     boolean cpy = false, paste = false;
@@ -556,6 +557,7 @@ public class DirectoryFragment extends Fragment {
         final MenuItem yapistirmenu = menu.findItem(R.id.yapistir);
         final MenuItem copymenu = menu.findItem(R.id.copy);
         final MenuItem duzenlemenu= menu.findItem(R.id.duzenle);
+        final MenuItem tasimenu=menu.findItem(R.id.move);
 
         if(counter>1)
         {
@@ -568,9 +570,24 @@ public class DirectoryFragment extends Fragment {
         yapistirmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                yapistir();
+                if(tasi==true)
+                {
+                    yapistir();
+                    kes();
+                    yapistirmenu.setVisible(false);
+                    copymenu.setVisible(true);
+                    tasimenu.setVisible(true);
+                    tasi=false;
+
+                }
+
+                    yapistir();
                 yapistirmenu.setVisible(false);
                 copymenu.setVisible(true);
+
+
+
+
                 return false;
             }
         });
@@ -592,7 +609,26 @@ public class DirectoryFragment extends Fragment {
                 return false;
             }
         });
+        tasimenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                kopyala();
+                if (cpy && copyList.size() > 0) {
+                    yapistirmenu.setVisible(true);
+                    for (int count = 0; count < items.size(); count++) {
+                        items.get(count).setVisible(false);
+                    }
+                    baseAdapter.notifyDataSetChanged();
+                    click = true;
+                    cpy = false;
+                    copymenu.setVisible(false);
+                    tasimenu.setVisible(false);
+                    tasi=true;
+                }
 
+                return false;
+            }
+        });
 
         silmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -700,9 +736,8 @@ public class DirectoryFragment extends Fragment {
             for (int count = 0; count < items.size(); count++) {
                 if (items.get(count).getCheck()) {
                     copyList.add(items.get(count).getThumb());
-                }
+                }}
 
-            }
             if (copyList.size() > 0) {
                 //kopyalama işlemleri yapılacak yani yapıştır çağırılacak
             } else {
@@ -719,7 +754,22 @@ public class DirectoryFragment extends Fragment {
             baseAdapter.notifyDataSetChanged();
         }
     }
+private void kes()
+{
+    if(tasi==true)
+    {
+        FileTransactions tran = new FileTransactions();
+        paste = true;
 
+        for (int count = 0; count < copyList.size(); count++) {
+
+           File moving=new File(copyList.get(count));
+           FileTransactions.DeleteRecursive(moving);
+        }
+        listFiles(currentDir);
+    }
+
+}
     private void yapistir() {
         FileTransactions tran = new FileTransactions();
         paste = true;
