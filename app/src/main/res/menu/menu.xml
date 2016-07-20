@@ -10,6 +10,8 @@
         android:title="Zip"/>
     <item android:id="@+id/duzenle"
         android:title="Düzenle"/>
+    <item android:id="@+id/create"
+        android:title="Create Folder"/>
     <item android:id="@+id/move"
         android:title="Taşı"/>
     <item android:id="@+id/yapistir"

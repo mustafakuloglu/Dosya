@@ -67,10 +67,10 @@ public class DirectoryFragment extends Fragment {
     String targetPath = null;
     String renamePath = null;
     String silPath = null;
-    int counter=0;
+    int counter = 0;
     CheckBox check;
     boolean click = true;
-    boolean tasi=false;
+    boolean tasi = false;
     File[] files = null;
     Toolbar toolbar;
     boolean cpy = false, paste = false;
@@ -556,32 +556,35 @@ public class DirectoryFragment extends Fragment {
         final MenuItem silmenu = menu.findItem(R.id.delete);
         final MenuItem yapistirmenu = menu.findItem(R.id.yapistir);
         final MenuItem copymenu = menu.findItem(R.id.copy);
-        final MenuItem duzenlemenu= menu.findItem(R.id.duzenle);
-        final MenuItem tasimenu=menu.findItem(R.id.move);
-
-
+        final MenuItem duzenlemenu = menu.findItem(R.id.duzenle);
+        final MenuItem tasimenu = menu.findItem(R.id.move);
+        final MenuItem createmenu=menu.findItem(R.id.create);
+        if (counter > 1) {
+            duzenlemenu.setVisible(false);
+        }
+        if (counter == 1 || counter == 0) {
+            duzenlemenu.setVisible(true);
+        }
 
         yapistirmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                if(tasi==true)
-                {
+                if (tasi == true) {
                     yapistir();
                     kes();
                     yapistirmenu.setVisible(false);
                     copymenu.setVisible(true);
                     tasimenu.setVisible(true);
-                    tasi=false;
+                    tasi = false;
                     copyList.clear();
-                }
-else {
+                } else {
                     yapistir();
                     yapistirmenu.setVisible(false);
                     copymenu.setVisible(true);
                     copyList.clear();
                 }
 
-
+                listFiles(currentDir);
                 return false;
             }
         });
@@ -617,7 +620,7 @@ else {
                     cpy = false;
                     copymenu.setVisible(false);
                     tasimenu.setVisible(false);
-                    tasi=true;
+                    tasi = true;
                 }
 
                 return false;
@@ -655,18 +658,63 @@ else {
                         .title("Add Item")
                         .widgetColor(getResources().getColor(R.color.colorPrimaryDark))
                         .inputType(InputType.TYPE_CLASS_TEXT)
-                        .input(null,null, new MaterialDialog.InputCallback() {
+                        .input(null, null, new MaterialDialog.InputCallback() {
                             @Override
                             public void onInput(MaterialDialog dialog, CharSequence input) {
 
-                                for (int count=0;count<items.size();count++)
-                                {
-                                    if(items.get(count).getCheck())
-                                    {   String newname=input.toString();
-                                        renamePath=items.get(count).getThumb();
-                                        File konum =new File(renamePath);
-                                        File yeniisim=new File(konum.getParent(),newname);
+                                for (int count = 0; count < items.size(); count++) {
+                                    if (items.get(count).getCheck()) {
+                                        String newname = input.toString();
+                                        renamePath = items.get(count).getThumb();
+                                        File konum = new File(renamePath);
+                                        File yeniisim = new File(konum.getParent(), newname);
                                         konum.renameTo(yeniisim);
+                                    }
+                                }
+                                listFiles(currentDir);
+                        }
+                        }).negativeText("Cancel").show();
+
+              /*  for (int count = 0; count < items.size(); count++) {
+                    if (items.get(count).getCheck()) {
+                       renamePath = items.get(count).getThumb();
+                        File konum = new File(renamePath);
+                        File yenisim = new File(konum.getParent(),"degis");
+                        konum.renameTo(yenisim);
+                        listFiles(currentDir);
+                    }
+                    items.get(count).setVisible(false);
+                }*/
+                click = true;
+                return false;
+            }
+        });
+        createmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                MaterialDialog builder = new MaterialDialog.Builder(getActivity())
+                        .title("Add Item")
+                        .widgetColor(getResources().getColor(R.color.colorPrimaryDark))
+                        .inputType(InputType.TYPE_CLASS_TEXT)
+                        .input(null, null, new MaterialDialog.InputCallback() {
+                            @Override
+                            public void onInput(MaterialDialog dialog, CharSequence input) {
+
+                                for (int count = 0; count < items.size(); count++) {
+                                    if (items.get(count).getCheck()) {
+                                        String newfolder = input.toString();
+                                        createpath = items.get(count).getThumb();
+                                        File folder = new File(createpath +
+                                                File.separator + newfolder);
+                                        boolean success = true;
+                                        if (!folder.exists()) {
+                                            success = folder.mkdir();
+                                        }
+                                        if (success) {
+                                            // Do something on success
+                                        } else {
+                                            // Do something else on failure
+                                        }
                                     }
                                 }
                                 listFiles(currentDir);
@@ -676,7 +724,6 @@ else {
               /*  for (int count = 0; count < items.size(); count++) {
                     if (items.get(count).getCheck()) {
                        renamePath = items.get(count).getThumb();
-
                         File konum = new File(renamePath);
                         File yenisim = new File(konum.getParent(),"degis");
                         konum.renameTo(yenisim);
@@ -685,13 +732,9 @@ else {
                     items.get(count).setVisible(false);
                 }*/
                 click = true;
-
                 return false;
             }
         });
-
-
-
 
     }
 
@@ -730,7 +773,8 @@ else {
             for (int count = 0; count < items.size(); count++) {
                 if (items.get(count).getCheck()) {
                     copyList.add(items.get(count).getThumb());
-                }}
+                }
+            }
 
             if (copyList.size() > 0) {
                 //kopyalama işlemleri yapılacak yani yapıştır çağırılacak
@@ -748,33 +792,31 @@ else {
             baseAdapter.notifyDataSetChanged();
         }
     }
-private void kes()
-{
-    if(tasi==true)
-    {
-        FileTransactions tran = new FileTransactions();
-        paste = true;
 
-        for (int count = 0; count < copyList.size(); count++) {
+    private void kes() {
+        if (tasi == true) {
+            FileTransactions tran = new FileTransactions();
+            paste = true;
 
-           File moving=new File(copyList.get(count));
-           FileTransactions.DeleteRecursive(moving);
+            for (int count = 0; count < copyList.size(); count++) {
+
+                File moving = new File(copyList.get(count));
+                FileTransactions.DeleteRecursive(moving);
+            }
+            listFiles(currentDir);
         }
-        listFiles(currentDir);
+
     }
 
-}
     private void yapistir() {
         FileTransactions tran = new FileTransactions();
         paste = true;
 
         for (int count = 0; count < copyList.size(); count++) {
-
-
             tran.copyFileOrDirectory(copyList.get(count), currentDir.getAbsolutePath());
         }
 
-        listFiles(currentDir);
+
 
     }
 
@@ -783,5 +825,4 @@ private void kes()
 
         public void updateToolBarName(String name);
     }
-
 }
