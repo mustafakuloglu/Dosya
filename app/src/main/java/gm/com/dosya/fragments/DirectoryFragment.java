@@ -578,14 +578,14 @@ public class DirectoryFragment extends Fragment {
                     copymenu.setVisible(true);
                     tasimenu.setVisible(true);
                     tasi=false;
-
+                    copyList.clear();
                 }
-
+else {
                     yapistir();
-                yapistirmenu.setVisible(false);
-                copymenu.setVisible(true);
-
-
+                    yapistirmenu.setVisible(false);
+                    copymenu.setVisible(true);
+                    copyList.clear();
+                }
 
 
                 return false;
@@ -777,6 +777,7 @@ private void kes()
         for (int count = 0; count < copyList.size(); count++) {
             tran.copyFileOrDirectory(copyList.get(count), currentDir.getAbsolutePath());
         }
+
         listFiles(currentDir);
 
     }
