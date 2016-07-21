@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:myapp="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/delete"
-    android:title="Sil"/>
     <item android:id="@+id/copy"
         myapp:showAsAction="always"
     android:title="Kopyala"/>
@@ -10,6 +8,8 @@
         android:title="Zip"/>
     <item android:id="@+id/duzenle"
         android:title="Düzenle"/>
+    <item android:id="@+id/delete"
+        android:title="Sil"/>
     <item android:id="@+id/create"
         android:title="Create Folder"/>
     <item android:id="@+id/move"
