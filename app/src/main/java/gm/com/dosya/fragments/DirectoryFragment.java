@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Base64;
@@ -37,6 +38,7 @@ import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.sromku.simple.storage.Storage;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -58,7 +60,7 @@ public class DirectoryFragment extends Fragment {
 
     private static String title_ = "";
     public String ilkelPath = null;
-    public ArrayList<String> copyList;
+    public ArrayList<File> copyList;
     Button yapis;
     String rename = null;
     String copyPath = null;
@@ -88,6 +90,7 @@ public class DirectoryFragment extends Fragment {
     private long sizeLimit = 1024 * 1024 * 1024;
     private String[] chhosefileType = {".pdf", ".doc", ".docx", ".DOC", ".DOCX"};
     private UtilityMethods util;
+    Storage storage;
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context arg0, Intent intent) {
@@ -205,7 +208,7 @@ public class DirectoryFragment extends Fragment {
 
             getActivity().registerReceiver(receiver, util.getIntent());
         }
-        copyList = new ArrayList<String>();
+        copyList = new ArrayList<File>();
 
         if (fragmentView == null) {
             fragmentView = inflater.inflate(R.layout.document_select_layout,
@@ -577,14 +580,16 @@ public class DirectoryFragment extends Fragment {
                     tasimenu.setVisible(true);
                     tasi = false;
                     copyList.clear();
+                    listFiles(currentDir);
                 } else {
                     yapistir();
                     yapistirmenu.setVisible(false);
                     copymenu.setVisible(true);
                     copyList.clear();
+                    listFiles(currentDir);
                 }
 
-                listFiles(currentDir);
+
                 return false;
             }
         });
@@ -772,7 +777,7 @@ public class DirectoryFragment extends Fragment {
         if (cpy) {
             for (int count = 0; count < items.size(); count++) {
                 if (items.get(count).getCheck()) {
-                    copyList.add(items.get(count).getThumb());
+                    copyList.add(items.get(count).getFile());
                 }
             }
 
@@ -800,7 +805,7 @@ public class DirectoryFragment extends Fragment {
 
             for (int count = 0; count < copyList.size(); count++) {
 
-                File moving = new File(copyList.get(count));
+                File moving = new File(copyList.get(count).getPath());
                 FileTransactions.DeleteRecursive(moving);
             }
             listFiles(currentDir);
@@ -809,14 +814,15 @@ public class DirectoryFragment extends Fragment {
     }
 
     private void yapistir() {
+        String path= currentDir.getAbsolutePath();
         FileTransactions tran = new FileTransactions();
         paste = true;
 
         for (int count = 0; count < copyList.size(); count++) {
-            tran.copyFileOrDirectory(copyList.get(count), currentDir.getAbsolutePath());
+
+                tran.copyFileOrDirectory(copyList.get(count),path);
+
         }
-
-
 
     }
 
@@ -824,5 +830,9 @@ public class DirectoryFragment extends Fragment {
         public void didSelectFiles(DirectoryFragment activity, ArrayList<String> files);
 
         public void updateToolBarName(String name);
+    }
+    public FragmentActivity activity()
+    {
+        return getActivity();
     }
 }
