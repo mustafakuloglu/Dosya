@@ -70,6 +70,7 @@ public class DirectoryFragment extends Fragment {
     String copyPath = null;
     String createpath = null;
     private ArrayList<String> zipList;
+
     String itemname = null;
     String targetPath = null;
     String renamePath = null;
@@ -214,6 +215,7 @@ public class DirectoryFragment extends Fragment {
             getActivity().registerReceiver(receiver, util.getIntent());
         }
         copyList = new ArrayList<File>();
+        zipList=new ArrayList<>();
 
         if (fragmentView == null) {
             fragmentView = inflater.inflate(R.layout.document_select_layout,
@@ -568,28 +570,32 @@ public class DirectoryFragment extends Fragment {
         final MenuItem tasimenu = menu.findItem(R.id.move);
         final MenuItem createmenu=menu.findItem(R.id.create);
         final MenuItem zipmenu=menu.findItem(R.id.zip);
+        if (counter > 1) {
+            duzenlemenu.setVisible(false);
+        }
+        if (counter == 1 || counter == 0) {
+            duzenlemenu.setVisible(true);
+        }
 
         yapistirmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 if (tasi == true) {
-
+                    yapistir();
                     kes();
                     yapistirmenu.setVisible(false);
                     copymenu.setVisible(true);
                     tasimenu.setVisible(true);
                     tasi = false;
                     copyList.clear();
-                    listFiles(currentDir);
                 } else {
                     yapistir();
                     yapistirmenu.setVisible(false);
                     copymenu.setVisible(true);
                     copyList.clear();
-                    listFiles(currentDir);
                 }
 
-
+                listFiles(currentDir);
                 return false;
             }
         });
@@ -694,6 +700,7 @@ public class DirectoryFragment extends Fragment {
                 return false;
             }
         });
+
         zipmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -781,6 +788,7 @@ public class DirectoryFragment extends Fragment {
         });
 
     }
+
 
 
     private void drawerProcesses() {
