@@ -573,7 +573,7 @@ public class DirectoryFragment extends Fragment {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 if (tasi == true) {
-                    yapistir();
+
                     kes();
                     yapistirmenu.setVisible(false);
                     copymenu.setVisible(true);
@@ -839,18 +839,33 @@ public class DirectoryFragment extends Fragment {
     }
 
     private void kes() {
-        if (tasi == true) {
-            FileTransactions tran = new FileTransactions();
-            paste = true;
+//        if (tasi == true) {
+//            FileTransactions tran = new FileTransactions();
+//            paste = true;
+//
+//            for (int count = 0; count < copyList.size(); count++) {
+//                String gecici=copyList.get(count).getParent();
+//                if (currentDir.getAbsolutePath() != gecici)
+//                {
+//                    File moving = new File(copyList.get(count).getPath());
+//                    FileTransactions.DeleteRecursive(moving);
+//                }
+//
+//            }
+//
+//        }
+        String path= currentDir.getAbsolutePath();
 
-            for (int count = 0; count < copyList.size(); count++) {
+        for (int count = 0; count < copyList.size(); count++) {
 
-                File moving = new File(copyList.get(count).getPath());
-                FileTransactions.DeleteRecursive(moving);
+            FileTransactions.moveFileOrDirectory(copyList.get(count),path);
+            if(copyList.get(count).isDirectory())
+            {
+                FileTransactions.DeleteRecursive(copyList.get(count));
             }
-            listFiles(currentDir);
-        }
 
+        }
+        listFiles(currentDir);
     }
 
     private void yapistir() {

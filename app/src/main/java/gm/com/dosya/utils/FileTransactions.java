@@ -29,6 +29,7 @@ public class FileTransactions {
 
                 String files[] = src.list();
                 int filesLength = files.length;
+
                 for (int i = 0; i < filesLength; i++) {
                     String src1 = (new File(src, files[i]).getPath());
                     String dst1 = dst.getPath()+"/"+src.getName();
@@ -36,6 +37,7 @@ public class FileTransactions {
                     copyFileOrDirectory(new File(src1), dst1);
 
                 }
+
             } else {
                 storage.copy(src, dst.getAbsolutePath().substring(20),src.getName());
             }
@@ -76,6 +78,37 @@ public class FileTransactions {
 
         fileOrDirectory.delete();
 
+    }
+    public static void move(File file,String directoryname,String filename)
+    {
+        storage= SimpleStorage.getExternalStorage();
+        storage.move(file,directoryname,filename);
+
+    }
+    public static void moveFileOrDirectory(File src, String dstDir) {
+        storage= SimpleStorage.getExternalStorage();
+        try {
+            File dst = new File(dstDir);
+
+            if (src.isDirectory()) {
+
+                String files[] = src.list();
+                int filesLength = files.length;
+
+                for (int i = 0; i < filesLength; i++) {
+                    String src1 = (new File(src, files[i]).getPath());
+                    String dst1 = dst.getPath()+"/"+src.getName();
+                    storage.createDirectory(dst1.substring(20));
+                    moveFileOrDirectory(new File(src1), dst1);
+
+                }
+
+            } else {
+                storage.move(src, dst.getAbsolutePath().substring(20),src.getName());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
