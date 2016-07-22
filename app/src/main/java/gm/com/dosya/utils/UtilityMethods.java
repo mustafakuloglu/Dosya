@@ -7,11 +7,14 @@ import android.os.StatFs;
 import android.util.Base64;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by musta on 19.07.2016.
  */
 public class UtilityMethods {
+    private static ArrayList<String> mediaPathList;
 
     public String BitMapToString(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -58,6 +61,26 @@ public class UtilityMethods {
         filter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
         filter.addDataScheme("file");
         return filter;
+    }
+
+    public static List<String> getMediaPath()
+    {
+        mediaPathList=new ArrayList<>();
+        mediaPathList.add("/storage/emulated/0/DCIM");
+        mediaPathList.add("/storage/emulated/0/Download");
+        mediaPathList.add("/storage/emulated/0/CamScanner");
+        mediaPathList.add("/storage/emulated/0/Facebook Messenger");
+        mediaPathList.add("/storage/emulated/0/Documents");
+        mediaPathList.add("/storage/emulated/0/Movies");
+        mediaPathList.add("/storage/emulated/0/Music");
+        mediaPathList.add("/storage/emulated/0/Notifications");
+        mediaPathList.add("/storage/emulated/0/Pictures");
+        mediaPathList.add("/storage/emulated/0/Podcasts");
+        mediaPathList.add("/storage/emulated/0/Snapchat");
+        mediaPathList.add("/storage/emulated/0/Telegram");
+        mediaPathList.add("/storage/emulated/0/WhatsApp");
+
+        return mediaPathList;
     }
 
 

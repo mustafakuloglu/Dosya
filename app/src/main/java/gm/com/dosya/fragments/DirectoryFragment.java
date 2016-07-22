@@ -526,6 +526,59 @@ public class DirectoryFragment extends Fragment {
         baseAdapter.notifyDataSetChanged();
         return true;
     }
+    private boolean listList(ArrayList<File> mediaFile)
+    {
+        for (File file : mediaFile) {
+
+            if (file.getName().startsWith(".") || file.getName().endsWith(".dm")) {
+                continue;
+            }
+            ListItem item = new ListItem();
+            item.setTitle(file.getName());
+
+            item.setFile(file);
+            item.setThumb(file.getAbsolutePath());
+            if (file.isDirectory()) {
+                item.setIcon(R.drawable.ic_directory);
+                item.setSubtitle("Folder");
+            } else {
+                String fname = file.getName();
+                String[] sp = fname.split("\\.");
+                item.setExt(sp.length > 1 ? sp[sp.length - 1] : "?");
+                item.setSubtitle(UtilityMethods.formatFileSize(file.length()));
+                fname = fname.toLowerCase();
+                if (fname.endsWith(".jpg") || fname.endsWith(".png")
+                        || fname.endsWith(".gif") || fname.endsWith(".jpeg")) {
+                    item.setThumb(file.getAbsolutePath());
+                    item.setIcon(R.drawable.foto);
+                }
+
+
+                if (fname.endsWith(".mp3") || (fname.endsWith(".amr"))) {
+                    item.setIcon(R.drawable.music);
+                }
+                if (fname.endsWith(".zip") || (fname.endsWith(".rar"))) {
+                    item.setIcon(R.drawable.zip);
+                }
+                if (fname.endsWith(".docx")) {
+                    item.setIcon(R.drawable.word);
+                }
+                if (fname.endsWith(".mp4") || (fname.endsWith(".mpg")) || (fname.endsWith(".avi")) || (fname.endsWith(".3gp"))) {
+                    item.setIcon(R.drawable.video);
+                }
+                if (fname.endsWith(".pdf")) {
+                    item.setIcon(R.drawable.pdf);
+                }
+            }
+
+
+            items.add(item);
+        }
+
+
+        baseAdapter.notifyDataSetChanged();
+        return true;
+    }
 
     public void showErrorBox(String error) {
         if (getActivity() == null) {
@@ -737,7 +790,7 @@ public class DirectoryFragment extends Fragment {
 
     private void drawerProcesses() {
         PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("GENERAL MOBİLE");
-        SecondaryDrawerItem item2 = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(2).withName("Galeri");
+        final SecondaryDrawerItem item2 = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(2).withName("Galeri");
         SecondaryDrawerItem item3 = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(3).withName("Cihaz Bilgisi");
         item1.withIcon(R.drawable.gm);
         item2.withIcon(R.drawable.galeri);
@@ -757,6 +810,11 @@ public class DirectoryFragment extends Fragment {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                       if(drawerItem==item2)
+                       {
+                           FileTransactions.catagoryMedia();
+                           listList(FileTransactions.getListPic());
+                       }
                         return false;
                     }
 
