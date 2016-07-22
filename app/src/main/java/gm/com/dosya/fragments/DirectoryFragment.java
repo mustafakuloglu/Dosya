@@ -46,6 +46,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 
 import gm.com.dosya.R;
@@ -61,6 +62,7 @@ public class DirectoryFragment extends Fragment {
     private static String title_ = "";
     public String ilkelPath = null;
     public ArrayList<File> copyList;
+    private ArrayList<String> infoList;
     Button yapis;
     String rename = null;
     String copyPath = null;
@@ -212,6 +214,7 @@ public class DirectoryFragment extends Fragment {
         }
         copyList = new ArrayList<File>();
         zipList=new ArrayList<>();
+        infoList=new ArrayList<>();
 
         if (fragmentView == null) {
             fragmentView = inflater.inflate(R.layout.document_select_layout,
@@ -234,7 +237,7 @@ public class DirectoryFragment extends Fragment {
                 @Override
                 public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-
+                    counter=0;
                     ilkelPath = items.get(position).getThumb();
                     itemname = items.get(position).getTitle();
                     rename = items.get(position).getTitle();
@@ -619,6 +622,7 @@ public class DirectoryFragment extends Fragment {
         final MenuItem tasimenu = menu.findItem(R.id.move);
         final MenuItem createmenu=menu.findItem(R.id.create);
         final MenuItem zipmenu=menu.findItem(R.id.zip);
+        final MenuItem infomenu=menu.findItem(R.id.info);
 
         yapistirmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -699,7 +703,27 @@ public class DirectoryFragment extends Fragment {
                 return false;
             }
         });
-
+        infomenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                infoliste();
+                MaterialDialog builder = new MaterialDialog.Builder(getActivity())
+                        .title("Özellikler")
+                        .items(infoList)
+                        .itemsCallback(new MaterialDialog.ListCallback() {
+                            @Override
+                            public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                            }
+                        })
+                        .negativeText("İPTAL")
+                        .positiveText("OK")
+                        .show();
+                listFiles(currentDir);
+                infoList.clear();
+                click = true;
+                return false;
+            }
+        });
         duzenlemenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -890,7 +914,29 @@ public class DirectoryFragment extends Fragment {
         }
 
     }
+    private void infoliste()
+    {
+        for (int count=0;count<items.size();count++)
+        {
+            if(items.get(count).getCheck()) {
+                infoList.add("Name:" + " " + items.get(count).getTitle());
+                infoList.add("Location:" + " " + items.get(count).getThumb());
 
+                File infof=new File(items.get(count).getThumb());
+                Date dd=new Date(infof.lastModified());
+                if(infof.isDirectory())
+                {   String files[] = infof.list();
+                    int filesLength = files.length;
+                    infoList.add("Size:" + " "+ filesLength + " "+ "Items");
+                    infoList.add("Date:"+ " "+ dd);
+                }
+                else{
+                    infoList.add("Boyut:"+" "+items.get(count).getSubtitle());
+                    infoList.add("Date:"+ " "+ dd);
+                }
+            }
+        }
+    }
     public static abstract interface DocumentSelectActivityDelegate {
         public void didSelectFiles(DirectoryFragment activity, ArrayList<String> files);
 

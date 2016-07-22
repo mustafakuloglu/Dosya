@@ -3,7 +3,7 @@
     xmlns:myapp="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/copy"
         myapp:showAsAction="always"
-    android:title="Kopyala"/>
+        android:title="Kopyala"/>
     <item android:id="@+id/zip"
         android:title="Zip"/>
     <item android:id="@+id/duzenle"
@@ -18,6 +18,8 @@
         android:title="Yapıştır"
         myapp:showAsAction="always"
         android:visible="false"/>
+    <item android:id="@+id/info"
+        android:title="Özellikler"/>
 
 
 </menu>
