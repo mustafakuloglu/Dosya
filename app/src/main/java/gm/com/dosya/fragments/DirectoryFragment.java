@@ -42,16 +42,11 @@ import com.sromku.simple.storage.Storage;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import gm.com.dosya.R;
 import gm.com.dosya.adapters.BaseFragmentAdapter;
@@ -59,6 +54,7 @@ import gm.com.dosya.models.HistoryEntry;
 import gm.com.dosya.models.ListItem;
 import gm.com.dosya.utils.FileTransactions;
 import gm.com.dosya.utils.UtilityMethods;
+import gm.com.dosya.utils.ZipUtility;
 
 public class DirectoryFragment extends Fragment {
 
@@ -69,12 +65,12 @@ public class DirectoryFragment extends Fragment {
     String rename = null;
     String copyPath = null;
     String createpath = null;
-    private ArrayList<String> zipList;
-
+    private ArrayList<ListItem> zipList;
     String itemname = null;
     String targetPath = null;
     String renamePath = null;
     String silPath = null;
+    String newzipfolder=null;
     int counter = 0;
     CheckBox check;
     boolean click = true;
@@ -570,32 +566,28 @@ public class DirectoryFragment extends Fragment {
         final MenuItem tasimenu = menu.findItem(R.id.move);
         final MenuItem createmenu=menu.findItem(R.id.create);
         final MenuItem zipmenu=menu.findItem(R.id.zip);
-        if (counter > 1) {
-            duzenlemenu.setVisible(false);
-        }
-        if (counter == 1 || counter == 0) {
-            duzenlemenu.setVisible(true);
-        }
 
         yapistirmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 if (tasi == true) {
-                    yapistir();
+
                     kes();
                     yapistirmenu.setVisible(false);
                     copymenu.setVisible(true);
                     tasimenu.setVisible(true);
                     tasi = false;
                     copyList.clear();
+                    listFiles(currentDir);
                 } else {
                     yapistir();
                     yapistirmenu.setVisible(false);
                     copymenu.setVisible(true);
                     copyList.clear();
+                    listFiles(currentDir);
                 }
 
-                listFiles(currentDir);
+
                 return false;
             }
         });
@@ -645,14 +637,7 @@ public class DirectoryFragment extends Fragment {
                     if (items.get(count).getCheck()) {
                         File cont = new File(items.get(count).getThumb());
                         FileTransactions.DeleteRecursive(cont);
-//                        if(cont.isDirectory())
-//                        {
-//                            FileTransactions.deleteFileOrDirectory(items.get(count).getThumb());
-//                            FileTransactions.deleteDirectory(FileTransactions.sortDirectory(items.get(count).getThumb()));
-//                        }
-//                     else {
-//                            FileTransactions.deleteFileOrDirectory(items.get(count).getThumb());
-//                        }
+
                     }
                     items.get(count).setVisible(false);
                 }
@@ -686,21 +671,11 @@ public class DirectoryFragment extends Fragment {
                             }
                         }).negativeText("Cancel").show();
 
-              /*  for (int count = 0; count < items.size(); count++) {
-                    if (items.get(count).getCheck()) {
-                       renamePath = items.get(count).getThumb();
-                        File konum = new File(renamePath);
-                        File yenisim = new File(konum.getParent(),"degis");
-                        konum.renameTo(yenisim);
-                        listFiles(currentDir);
-                    }
-                    items.get(count).setVisible(false);
-                }*/
+
                 click = true;
                 return false;
             }
         });
-
         zipmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -711,35 +686,14 @@ public class DirectoryFragment extends Fragment {
                         .input(null, null, new MaterialDialog.InputCallback() {
                             @Override
                             public void onInput(MaterialDialog dialog, CharSequence input) {
-
-                                for (int count = 0; count < items.size(); count++) {
-                                    if (items.get(count).getCheck()) {
-
-                                        zipList.add(items.get(count).getThumb());
-                                    }
-                                }
-                                String[] zipDizi=new String[zipList.size()];
-                                zipList.toArray(zipDizi);
-
-                                String newzipfolder = input.toString();
-                                newzipfolder=currentDir.getAbsolutePath()+"/"+newzipfolder+".zip";
-                                // zip(zipDizi,newzipfolder);
-                                zipFolder(zipList.get(0),newzipfolder);
+                            String   anewzipfolder = input.toString();
+                                newzipfolder=anewzipfolder;
+                                ziple();
                                 listFiles(currentDir);
                             }
                         }).negativeText("Cancel").show();
 
-              /*  for (int count = 0; count < items.size(); count++) {
-                    if (items.get(count).getCheck()) {
-                       renamePath = items.get(count).getThumb();
-                        File konum = new File(renamePath);
-                        File yenisim = new File(konum.getParent(),"degis");
-                        konum.renameTo(yenisim);
-                        listFiles(currentDir);
-                    }
-                    items.get(count).setVisible(false);
-                }*/
-                click = true;
+                click=true;
                 return false;
             }
         });
@@ -772,23 +726,13 @@ public class DirectoryFragment extends Fragment {
                             }
                         }).negativeText("Cancel").show();
 
-              /*  for (int count = 0; count < items.size(); count++) {
-                    if (items.get(count).getCheck()) {
-                       renamePath = items.get(count).getThumb();
-                        File konum = new File(renamePath);
-                        File yenisim = new File(konum.getParent(),"degis");
-                        konum.renameTo(yenisim);
-                        listFiles(currentDir);
-                    }
-                    items.get(count).setVisible(false);
-                }*/
+
                 click = true;
                 return false;
             }
         });
 
     }
-
 
 
     private void drawerProcesses() {
@@ -888,36 +832,24 @@ public class DirectoryFragment extends Fragment {
         }
 
     }
-    private static void zipFolder(String inputFolderPath, String outZipPath) {
-        try {
-            FileOutputStream fos = new FileOutputStream(outZipPath);
-            ZipOutputStream zos = new ZipOutputStream(fos);
-            File srcFile = new File(inputFolderPath);
-            File[] files = srcFile.listFiles();
-            Log.d("", "Zip directory: " + srcFile.getName());
-            for (int i = 0; i < files.length; i++) {
-                Log.d("", "Adding file: " + files[i].getName());
-                byte[] buffer = new byte[1024];
-                FileInputStream fis = new FileInputStream(files[i]);
-                zos.putNextEntry(new ZipEntry(files[i].getName()));
-                int length;
-                while ((length = fis.read(buffer)) > 0) {
-                    zos.write(buffer, 0, length);
-                }
-                zos.closeEntry();
-                fis.close();
-            }
-            zos.close();
-        } catch (IOException ioe) {
-            Log.e("", ioe.getMessage());
-        }
-    }
 
     public static abstract interface DocumentSelectActivityDelegate {
         public void didSelectFiles(DirectoryFragment activity, ArrayList<String> files);
 
         public void updateToolBarName(String name);
     }
+   private void ziple()
+   {
+       for (int count=0;count<items.size();count++)
+       {
+           if(items.get(count).getCheck())
+           {
+               zipList.add(items.get(count));
+           }
+       }
+       newzipfolder=currentDir.getPath()+"/"+newzipfolder+".zip";
+       ZipUtility.zipFileOrFolder(zipList,newzipfolder);
+   }
 }
 
 
