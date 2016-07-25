@@ -734,11 +734,20 @@ public class DirectoryFragment extends Fragment {
         duzenlemenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
+                String isim = null;
+                for(ListItem gecici :items)
+                {
+                    if(gecici.getCheck())
+                    {
+                        isim=gecici.getTitle();
+                    }
+                }
                 MaterialDialog builder = new MaterialDialog.Builder(getActivity())
                         .title("Add Item")
                         .widgetColor(getResources().getColor(R.color.colorPrimaryDark))
                         .inputType(InputType.TYPE_CLASS_TEXT)
-                        .input(null, null, new MaterialDialog.InputCallback() {
+
+                        .input(null, isim, new MaterialDialog.InputCallback() {
                             @Override
                             public void onInput(MaterialDialog dialog, CharSequence input) {
 
@@ -847,39 +856,59 @@ public class DirectoryFragment extends Fragment {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        ArrayList<File> control=new ArrayList<File>();
                         if (drawerItem == pics) {
                             FileTransactions.catagoryMedia();
+                            control=FileTransactions.getListPic();
                             listList(FileTransactions.getListPic());
-                            if (FileTransactions.getListDoc().size() == 0) {
+                            if (control.size() == 0) {
                                 showErrorBox("Görüntü dosyası bulunumadı");
+                                listRoots();
+                                updateName("Directory");
                             }
                         }
                         if (drawerItem == docs) {
                             FileTransactions.catagoryMedia();
+                            control=FileTransactions.getListDoc();
+
                             listList(FileTransactions.getListDoc());
-                            if (FileTransactions.getListDoc().size() == 0) {
+                            if (control.size() == 0) {
                                 showErrorBox("Döküman bulunumadı");
+                                listRoots();
+                                updateName("Directory");
                             }
                         }
                         if (drawerItem == sounds) {
                             FileTransactions.catagoryMedia();
                             listList(FileTransactions.getListSound());
-                            if (FileTransactions.getListDoc().size() == 0) {
+                            control=FileTransactions.getListSound();
+
+                            if (control.size() == 0) {
                                 showErrorBox("Ses dosyası bulunumadı;");
+                                listRoots();
+                                updateName("Directory");
                             }
                         }
                         if (drawerItem == comps) {
                             FileTransactions.catagoryMedia();
                             listList(FileTransactions.getListCompress());
-                            if (FileTransactions.getListDoc().size() == 0) {
+                            control=FileTransactions.getListCompress();
+
+                            if (control.size() == 0) {
                                 showErrorBox("Sıkıştırılmış arşiv dosyası bulunumadı;");
+                                listRoots();
+                                updateName("Directory");
                             }
                         }
                         if (drawerItem == videos) {
                             FileTransactions.catagoryMedia();
                             listList(FileTransactions.getListVideo());
-                            if (FileTransactions.getListDoc().size() == 0) {
+                            control=FileTransactions.getListVideo();
+
+                            if (control.size() == 0) {
                                 showErrorBox("Video dosyası bulunumadı");
+                                listRoots();
+                                updateName("Directory");
                             }
                         }
                         if (drawerItem == item1) {
@@ -944,8 +973,12 @@ public class DirectoryFragment extends Fragment {
             if (copyList.get(count).isDirectory()) {
                 FileTransactions.DeleteRecursive(copyList.get(count));
             }
-
-        }
+          else{
+              yapistir();
+                for ( count = 0; count < copyList.size(); count++) {
+                    File moving=new File(String.valueOf(copyList.get(count)));
+                    FileTransactions.DeleteRecursive(moving);
+                }}}
         listFiles(currentDir);
     }
 
