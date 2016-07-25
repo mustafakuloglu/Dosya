@@ -3,6 +3,7 @@ package gm.com.dosya.fragments;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -30,6 +31,7 @@ import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.AlertDialogWrapper;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
@@ -212,6 +214,7 @@ public class DirectoryFragment extends Fragment {
         copyList = new ArrayList<File>();
         zipList = new ArrayList<>();
         infoList = new ArrayList<>();
+
 
         if (fragmentView == null) {
             fragmentView = inflater.inflate(R.layout.document_select_layout,
@@ -725,16 +728,36 @@ else{createmenu.setVisible(true);}
         silmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                for (int count = 0; count < items.size(); count++) {
-                    if (items.get(count).getCheck()) {
-                        File cont = new File(items.get(count).getThumb());
-                        FileTransactions.DeleteRecursive(cont);
+                AlertDialog.Builder ad=new AlertDialog.Builder(getActivity());
+                ad.setTitle("Dosyayı sil");
+                ad.setMessage("Silinsin mi?");
+                        ad.setCancelable(false);
+                        ad.setPositiveButton("Evet", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int which) {
+                                for (int count = 0; count < items.size(); count++) {
+                            if (items.get(count).getCheck()) {
+                                File cont = new File(items.get(count).getThumb());
+                                FileTransactions.DeleteRecursive(cont);
+
+                            }
+                            items.get(count).setVisible(false);
+                        }
+                        listFiles(currentDir);
+                    }
+                });
+
+                ad.setNegativeButton("Hayır", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
 
                     }
-                    items.get(count).setVisible(false);
-                }
+                });
+
+                    AlertDialog alertDialog =ad.create();
+                    alertDialog.show();
                 click = true;
-                listFiles(currentDir);
+
                 return false;
             }
         });

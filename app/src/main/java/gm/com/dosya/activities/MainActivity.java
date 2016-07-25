@@ -1,12 +1,15 @@
 package gm.com.dosya.activities;
 
 import android.annotation.TargetApi;
+import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private FragmentManager fragmentManager = null;
     private FragmentTransaction fragmentTransaction = null;
     private DirectoryFragment mDirectoryFragment;
+
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,9 +56,6 @@ public class MainActivity extends AppCompatActivity {
                                              }
 
         );
-
-
-
 
 
         new DrawerBuilder().withActivity(this).build();
@@ -103,6 +104,42 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+            try {
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this); //Mesaj Penceresini Yaratalım
+                alertDialogBuilder.setTitle("Programdan Çıkılsın Mı?").setCancelable(false).setPositiveButton("Evet", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) { //Eğer evet butonuna basılırsa
+                        dialog.dismiss();
+                        android.os.Process.killProcess(android.os.Process.myPid());
+//Uygulamamızı sonlandırıyoruz.
+                    }
+
+                }).setNegativeButton("Hayır", new DialogInterface.OnClickListener() {
+
+//Eğer hayır butonuna basılırsa
+
+                    @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(getApplicationContext(), "Programdan çıkmaktan vazgeçtiniz.", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+                alertDialogBuilder.create().show();
+//son olarak alertDialogBuilder'ı oluşturup ekranda görüntületiyoruz.
+                return super.onKeyDown(keyCode, event);
+            } catch (IllegalStateException e) {  //yapımızı try-catch blogu içerisine aldık
+                //hata ihtimaline karşı.
+                e.printStackTrace();
+            }
+            return super.onKeyDown(keyCode, event);
+        }
+        return false;
+    }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -113,9 +150,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId())
-        {
-            case android.R.id.home:  onBackPressed();
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
                 break;
             case R.id.copy:
 
@@ -126,8 +163,8 @@ public class MainActivity extends AppCompatActivity {
 
         return true;
     }
-    private void drawerProcesses()
-    {
+
+    private void drawerProcesses() {
         PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("GENERAL MOBİLE");
         SecondaryDrawerItem item2 = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(2).withName("Galeri");
         Drawer result = new DrawerBuilder()
