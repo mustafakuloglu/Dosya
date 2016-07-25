@@ -31,7 +31,6 @@ import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.afollestad.materialdialogs.AlertDialogWrapper;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
@@ -215,7 +214,6 @@ public class DirectoryFragment extends Fragment {
         zipList = new ArrayList<>();
         infoList = new ArrayList<>();
 
-
         if (fragmentView == null) {
             fragmentView = inflater.inflate(R.layout.document_select_layout,
                     container, false);
@@ -292,16 +290,23 @@ public class DirectoryFragment extends Fragment {
                                 showErrorBox("Yetkiniz bulunmamaktadır.");
                                 return;
                             }
-                            MimeTypeMap myMime = MimeTypeMap.getSingleton();
-                            String mimeType = myMime.getMimeTypeFromExtension(getExtension(file));
+                           try {
+                               MimeTypeMap myMime = MimeTypeMap.getSingleton();
+                               String mimeType = myMime.getMimeTypeFromExtension(getExtension(file));
 
-                            Uri path = Uri.fromFile(file);
+                               Uri path = Uri.fromFile(file);
 
-                            Intent pdfOpenintent = new Intent(Intent.ACTION_VIEW);
-                            pdfOpenintent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            pdfOpenintent.setDataAndType(path, mimeType);
+                               Intent pdfOpenintent = new Intent(Intent.ACTION_VIEW);
+                               pdfOpenintent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                               pdfOpenintent.setDataAndType(path, mimeType);
 
-                            getActivity().startActivity(pdfOpenintent);
+                               getActivity().startActivity(pdfOpenintent);
+                           }
+                           catch (Exception e)
+                           {
+showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
+                           }
+
 
                         }
 
@@ -644,7 +649,7 @@ else{createmenu.setVisible(true);}
         yapistirmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                if (tasi == true) {
+                try{if (tasi == true) {
 
                     kes();
                     yapistirmenu.setVisible(false);
@@ -663,12 +668,16 @@ else{createmenu.setVisible(true);}
 
 
                 return false;
-            }
+                }
+                catch (Exception e)
+                {showErrorBox("Yapıştırma işlemi gerçekleştirilemedi");
+                    return false;
+                } }
         });
         infomenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                infoliste();
+               try{ infoliste();
                 MaterialDialog builder = new MaterialDialog.Builder(getActivity())
                         .title("Özellikler")
                         .items(infoList)
@@ -684,12 +693,17 @@ else{createmenu.setVisible(true);}
                 infoList.clear();
                 click = true;
                 return false;
+               }
+               catch (Exception e)
+               {showErrorBox("İşlem gerçekleştirilemedi");
+                   return false;
+               }
             }
         });
         copymenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                kopyala();
+               try{ kopyala();
                 if (cpy && copyList.size() > 0) {
                     yapistirmenu.setVisible(true);
                     for (int count = 0; count < items.size(); count++) {
@@ -702,12 +716,17 @@ else{createmenu.setVisible(true);}
                 }
 
                 return false;
+               }
+               catch (Exception e)
+               {showErrorBox("Kopyalama işlemi gerçekleştirilemedi");
+                   return false;
+               }
             }
         });
         tasimenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                kopyala();
+               try{ kopyala();
                 if (cpy && copyList.size() > 0) {
                     yapistirmenu.setVisible(true);
                     for (int count = 0; count < items.size(); count++) {
@@ -722,50 +741,62 @@ else{createmenu.setVisible(true);}
                 }
 
                 return false;
+               }
+               catch (Exception e)
+               {showErrorBox("Taşıma işlemi gerçekleştirilemedi");
+                   return false;
+               }
             }
         });
 
         silmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                AlertDialog.Builder ad=new AlertDialog.Builder(getActivity());
-                ad.setTitle("Dosyayı sil");
-                ad.setMessage("Silinsin mi?");
-                        ad.setCancelable(false);
-                        ad.setPositiveButton("Evet", new DialogInterface.OnClickListener() {
+                try {
+                    AlertDialog.Builder ad=new AlertDialog.Builder(getActivity());
+                             ad.setTitle("Dosyayı sil");
+                             ad.setMessage("Silinsin mi?");
+                                     ad.setCancelable(false);
+                                     ad.setPositiveButton("Evet", new DialogInterface.OnClickListener() {
+                @Override
+                        public void onClick(DialogInterface dialogInterface, int which) {
+                                for (int count = 0; count < items.size(); count++) {
+                                if (items.get(count).getCheck()) {
+                                        File cont = new File(items.get(count).getThumb());
+                                        FileTransactions.DeleteRecursive(cont);
+
+                                    }
+                                items.get(count).setVisible(false);
+                            }
+                        listFiles(currentDir);
+
+                        }
+                                     });
+
+                    ad.setNegativeButton("Hayır", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int which) {
-                                for (int count = 0; count < items.size(); count++) {
-                            if (items.get(count).getCheck()) {
-                                File cont = new File(items.get(count).getThumb());
-                                FileTransactions.DeleteRecursive(cont);
 
-                            }
-                            items.get(count).setVisible(false);
-                        }
-                        listFiles(currentDir);
-                    }
-                });
+                                        }
+                        });
 
-                ad.setNegativeButton("Hayır", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int which) {
+                        AlertDialog alertDialog =ad.create();
+                                        alertDialog.show();
+                    click = true;
 
-                    }
-                });
-
-                    AlertDialog alertDialog =ad.create();
-                    alertDialog.show();
-                click = true;
-
-                return false;
+                    return false;
+                }
+                catch (Exception e)
+                {showErrorBox("Silme işlemi gerçekleştirilemedi");
+                    return false;
+                }
             }
         });
 
         duzenlemenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                String isim = null;
+               try{ String isim = null;
                 for(ListItem gecici :items)
                 {
                     if(gecici.getCheck())
@@ -798,12 +829,17 @@ else{createmenu.setVisible(true);}
 
                 click = true;
                 return false;
+               }
+               catch (Exception e)
+               {showErrorBox("İşlem gerçekleştirilemedi");
+                   return false;
+               }
             }
         });
         zipmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                MaterialDialog builder = new MaterialDialog.Builder(getActivity())
+               try{ MaterialDialog builder = new MaterialDialog.Builder(getActivity())
                         .title("Add Item")
                         .widgetColor(getResources().getColor(R.color.colorPrimaryDark))
                         .inputType(InputType.TYPE_CLASS_TEXT)
@@ -819,13 +855,18 @@ else{createmenu.setVisible(true);}
 
                 click = true;
                 return false;
+               }
+               catch (Exception e)
+               {showErrorBox("Sıkıştırma işlemi gerçekleştirilemedi");
+                   return false;
+               }
             }
         });
 
         createmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                MaterialDialog builder = new MaterialDialog.Builder(getActivity())
+               try{ MaterialDialog builder = new MaterialDialog.Builder(getActivity())
                         .title("Add Item")
                         .widgetColor(getResources().getColor(R.color.colorPrimaryDark))
                         .inputType(InputType.TYPE_CLASS_TEXT)
@@ -853,6 +894,11 @@ else{createmenu.setVisible(true);}
 
                 click = true;
                 return false;
+               }
+               catch (Exception e)
+               {showErrorBox("İşlem gerçekleştirilemedi");
+                   return false;
+               }
             }
         });
 
@@ -866,7 +912,6 @@ else{createmenu.setVisible(true);}
         final SecondaryDrawerItem comps = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(4).withName("Sıkıştırılmış Dosyalar");
         final SecondaryDrawerItem videos = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(5).withName("Videolar");
         final SecondaryDrawerItem sounds = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(6).withName("Sesler");
-
 
 
         item1.withIcon(R.drawable.gm);
@@ -1044,12 +1089,12 @@ if(copyList.get(count).getParent().equals(path))
                 if(infof.isDirectory())
                 {   String files[] = infof.list();
                     int filesLength = files.length;
-                    infoList.add("Boyut:" + " "+ filesLength + " "+ "Parça");
-                    infoList.add("Oluşturulma Tarihi:"+ " "+ dd);
+                    infoList.add("Boyut:" + " "+ filesLength + " "+ "Items");
+                    infoList.add("Son Değişiklik:"+ " "+ dd);
                 }
                 else{
                     infoList.add("Boyut:"+" "+items.get(count).getSubtitle());
-                    infoList.add("Oluşturulma Tarihi:"+ " "+ dd);
+                    infoList.add("Son Değişiklik:"+ " "+ dd);
                 }
             }
         }
@@ -1061,6 +1106,7 @@ if(copyList.get(count).getParent().equals(path))
     }
 
     private void ziple() {
+        try{
         for (int count = 0; count < items.size(); count++) {
             if (items.get(count).getCheck()) {
                 zipList.add(items.get(count));
@@ -1068,6 +1114,13 @@ if(copyList.get(count).getParent().equals(path))
         }
         newzipfolder = currentDir.getPath() + "/" + newzipfolder + ".zip";
         ZipUtility.zipFileOrFolder(zipList, newzipfolder);
+        }
+        catch (Exception e)
+        {showErrorBox("Sıkıştırma işlemi gerçekleştirilemedi");
+
+        } }
+    public ArrayList<HistoryEntry> getHistory(){
+        return history;
     }
 
  }

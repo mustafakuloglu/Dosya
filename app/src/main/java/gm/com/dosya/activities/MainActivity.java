@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
     private FragmentManager fragmentManager = null;
     private FragmentTransaction fragmentTransaction = null;
     private DirectoryFragment mDirectoryFragment;
-
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
         View.OnClickListener mCorkyListener = new View.OnClickListener() {
             public void onClick(View v) {
-
+                Toast.makeText(getApplicationContext(), "basıldı", Toast.LENGTH_SHORT).show();
             }
         };
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
@@ -51,12 +50,11 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
                                                  @Override
                                                  public void onClick(View view) {
-
+                                                     Toast.makeText(getApplicationContext(), "basıldı", Toast.LENGTH_SHORT).show();
                                                  }
                                              }
 
         );
-
 
         new DrawerBuilder().withActivity(this).build();
         drawerProcesses();
@@ -92,24 +90,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        mDirectoryFragment.onFragmentDestroy();
-        super.onDestroy();
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (mDirectoryFragment.onBackPressed_()) {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-            try {
+if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+        try {
+            if(mDirectoryFragment.getHistory().size()==0) {
+
+
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this); //Mesaj Penceresini Yaratalım
-                alertDialogBuilder.setTitle("Programdan Çıkılsın Mı?").setCancelable(false).setPositiveButton("Evet", new DialogInterface.OnClickListener() {
+                alertDialogBuilder.setTitle("Programdan çıkılsın mı?").setCancelable(false).setPositiveButton("Evet", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) { //Eğer evet butonuna basılırsa
                         dialog.dismiss();
@@ -122,23 +110,35 @@ public class MainActivity extends AppCompatActivity {
 //Eğer hayır butonuna basılırsa
 
                     @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    Toast.makeText(getApplicationContext(), "Programdan çıkmaktan vazgeçtiniz.", Toast.LENGTH_SHORT).show();
-                }
-            });
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getApplicationContext(), "Programdan çıkmaktan vazgeçtiniz.", Toast.LENGTH_SHORT).show();
+                    }
+                });
 
                 alertDialogBuilder.create().show();
 //son olarak alertDialogBuilder'ı oluşturup ekranda görüntületiyoruz.
-                return super.onKeyDown(keyCode, event);
-            } catch (IllegalStateException e) {  //yapımızı try-catch blogu içerisine aldık
-                //hata ihtimaline karşı.
-                e.printStackTrace();
-            }
-            return super.onKeyDown(keyCode, event);
-        }
-        return false;
+            }return super.onKeyDown(keyCode, event);
+   } catch (IllegalStateException e) {  //yapımızı try-catch blogu içerisine aldık
+       //hata ihtimaline karşı.
+               e.printStackTrace();
+   }
+        return super.onKeyDown(keyCode, event);
+    }
+return false;
+ }
+
+    @Override
+    protected void onDestroy() {
+        mDirectoryFragment.onFragmentDestroy();
+        super.onDestroy();
     }
 
+    @Override
+    public void onBackPressed() {
+        if (mDirectoryFragment.onBackPressed_()) {
+            super.onBackPressed();
+        }
+    }
 
 
     @Override
@@ -150,9 +150,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
+        switch (item.getItemId())
+        {
+            case android.R.id.home:  onBackPressed();
                 break;
             case R.id.copy:
 
@@ -163,8 +163,8 @@ public class MainActivity extends AppCompatActivity {
 
         return true;
     }
-
-    private void drawerProcesses() {
+    private void drawerProcesses()
+    {
         PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("GENERAL MOBİLE");
         SecondaryDrawerItem item2 = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(2).withName("Galeri");
         Drawer result = new DrawerBuilder()
