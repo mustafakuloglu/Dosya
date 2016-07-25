@@ -1,6 +1,7 @@
 package gm.com.dosya.fragments;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -62,6 +64,15 @@ public class DirectoryFragment extends Fragment {
     public String ilkelPath = null;
     public ArrayList<File> copyList;
     Button yapis;
+    MenuItem silmenu;
+    MenuItem yapistirmenu;
+    MenuItem copymenu;
+    MenuItem duzenlemenu;
+    MenuItem tasimenu;
+    MenuItem createmenu;
+    MenuItem zipmenu;
+    MenuItem infomenu;
+    private ProgressDialog progress;
     String rename = null;
     String copyPath = null;
     String createpath = null;
@@ -213,6 +224,7 @@ public class DirectoryFragment extends Fragment {
         copyList = new ArrayList<File>();
         zipList = new ArrayList<>();
         infoList = new ArrayList<>();
+        progress = new ProgressDialog(getActivity());
 
         if (fragmentView == null) {
             fragmentView = inflater.inflate(R.layout.document_select_layout,
@@ -632,47 +644,27 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
         super.onPrepareOptionsMenu(menu);
 
         final MenuItem silmenu = menu.findItem(R.id.delete);
-        final MenuItem yapistirmenu = menu.findItem(R.id.yapistir);
-        final MenuItem copymenu = menu.findItem(R.id.copy);
+        yapistirmenu = menu.findItem(R.id.yapistir);
+        copymenu = menu.findItem(R.id.copy);
         final MenuItem duzenlemenu = menu.findItem(R.id.duzenle);
-        final MenuItem tasimenu = menu.findItem(R.id.move);
+
+        tasimenu = menu.findItem(R.id.move);
         final MenuItem createmenu = menu.findItem(R.id.create);
         final MenuItem zipmenu = menu.findItem(R.id.zip);
         final MenuItem infomenu = menu.findItem(R.id.info);
-if(counter==1)
-{duzenlemenu.setVisible(true);}
-else{duzenlemenu.setVisible(false);}
-if(counter>0)
-{createmenu.setVisible(false);}
-else{createmenu.setVisible(true);}
-
+        if(counter==1)
+        {duzenlemenu.setVisible(true);}
+        else{duzenlemenu.setVisible(false);}
+        if(counter>0)
+        {createmenu.setVisible(false);}
+        else{createmenu.setVisible(true);}
         yapistirmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                try{if (tasi == true) {
-
-                    kes();
-                    yapistirmenu.setVisible(false);
-                    copymenu.setVisible(true);
-                    tasimenu.setVisible(true);
-                    tasi = false;
-                    copyList.clear();
-                    listFiles(currentDir);
-                } else {
-                    yapistir();
-                    yapistirmenu.setVisible(false);
-                    copymenu.setVisible(true);
-                    copyList.clear();
-                    listFiles(currentDir);
-                }
-
+                new copyAsyncClass().execute();
 
                 return false;
-                }
-                catch (Exception e)
-                {showErrorBox("Yapıştırma işlemi gerçekleştirilemedi");
-                    return false;
-                } }
+            }
         });
         infomenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -904,7 +896,46 @@ else{createmenu.setVisible(true);}
 
     }
 
+    public class copyAsyncClass extends AsyncTask<String, String, String> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progress.setMessage("İşlem Sürüyor...");
 
+            progress.show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            if (tasi) {
+                kes();
+            } else {
+                yapistir();
+            }
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (tasi) {
+                yapistirmenu.setVisible(false);
+                copymenu.setVisible(true);
+                tasimenu.setVisible(true);
+                tasi = false;
+                copyList.clear();
+                listFiles(currentDir);
+            } else {
+                yapistirmenu.setVisible(false);
+                copymenu.setVisible(true);
+                copyList.clear();
+                listFiles(currentDir);
+            }
+            progress.dismiss();
+        }
+    }
     private void drawerProcesses() {
         final PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("GENERAL MOBİLE");
         final SecondaryDrawerItem pics = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(2).withName("Görüntüler");
@@ -1029,21 +1060,7 @@ else{createmenu.setVisible(true);}
     }
 
     private void kes() {
-//        if (tasi == true) {
-//            FileTransactions tran = new FileTransactions();
-//            paste = true;
-//
-//            for (int count = 0; count < copyList.size(); count++) {
-//                String gecici=copyList.get(count).getParent();
-//                if (currentDir.getAbsolutePath() != gecici)
-//                {
-//                    File moving = new File(copyList.get(count).getPath());
-//                    FileTransactions.DeleteRecursive(moving);
-//                }
-//
-//            }
-//
-//        }
+
         String path = currentDir.getAbsolutePath();
 
         for (int count = 0; count < copyList.size(); count++) {
@@ -1059,7 +1076,6 @@ else{createmenu.setVisible(true);}
                     File moving=new File(String.valueOf(copyList.get(count)));
                     FileTransactions.DeleteRecursive(moving);
                 }}}
-        listFiles(currentDir);
     }
 
     private void yapistir() {
