@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
         View.OnClickListener mCorkyListener = new View.OnClickListener() {
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "basıldı", Toast.LENGTH_SHORT).show();
+
             }
         };
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
                                                  @Override
                                                  public void onClick(View view) {
-                                                     Toast.makeText(getApplicationContext(), "basıldı", Toast.LENGTH_SHORT).show();
+
                                                  }
                                              }
 

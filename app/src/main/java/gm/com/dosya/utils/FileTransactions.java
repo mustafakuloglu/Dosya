@@ -37,6 +37,7 @@ public class FileTransactions {
 
     public static void copyFileOrDirectory(File src, String dstDir) {
         storage= SimpleStorage.getExternalStorage();
+
         try {
             File dst = new File(dstDir);
 

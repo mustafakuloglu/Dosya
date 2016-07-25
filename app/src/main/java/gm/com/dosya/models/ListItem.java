@@ -3,7 +3,7 @@ package gm.com.dosya.models;
 import java.io.File;
 
 /**
- * Created by musta on 11.07.2016.
+ * Created by Melik on 11.07.2016.
  */
 
 public class ListItem {

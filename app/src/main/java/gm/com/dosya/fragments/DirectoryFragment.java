@@ -358,9 +358,9 @@ public class DirectoryFragment extends Fragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
             if (Build.VERSION.SDK_INT < 9
                     || Environment.isExternalStorageRemovable()) {
-                ext.setTitle("Internal Storage");
+                ext.setTitle("Cihaz Belleği");
             } else {
-                ext.setTitle("Internal Storage");
+                ext.setTitle("Cihaz Belleği");
             }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
@@ -403,7 +403,7 @@ public class DirectoryFragment extends Fragment {
                     try {
                         ListItem item = new ListItem();
                         if (path.toLowerCase().contains("sd")) {
-                            ext.setTitle("Internal Storage");
+                            ext.setTitle("Cihaz Belleği");
                         } else {
                             ext.setTitle("ExternalStorage");
                         }
@@ -421,10 +421,10 @@ public class DirectoryFragment extends Fragment {
             Log.e("tmessages", e.toString());
         }
         ListItem fs = new ListItem();
-        fs.setTitle("/");
+        fs.setTitle("Root Dosyaları");
         fs.setSubtitle("SystemRoot");
         fs.setIcon(R.drawable.ic_directory);
-        fs.setFile(new File("/"));
+        fs.setFile(new File("Root Dosyaları"));
         items.add(fs);
 
         baseAdapter.notifyDataSetChanged();
@@ -456,7 +456,7 @@ public class DirectoryFragment extends Fragment {
             showErrorBox("AccessError");
             return false;
         }
-        emptyView.setText("NoFiles");
+        emptyView.setText("Klasör Boş");
 
         try {
             files = dir.listFiles();
@@ -840,14 +840,18 @@ else{createmenu.setVisible(true);}
         final PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("GENERAL MOBİLE");
         final SecondaryDrawerItem pics = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(2).withName("Görüntüler");
         final SecondaryDrawerItem docs = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(3).withName("Dökümanlar");
-        final SecondaryDrawerItem comps = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(4).withName("Sıkıştırılmış");
+        final SecondaryDrawerItem comps = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(4).withName("Sıkıştırılmış Dosyalar");
         final SecondaryDrawerItem videos = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(5).withName("Videolar");
         final SecondaryDrawerItem sounds = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(6).withName("Sesler");
+
 
 
         item1.withIcon(R.drawable.gm);
         pics.withIcon(R.drawable.galeri);
         docs.withIcon(R.drawable.documents);
+        comps.withIcon(R.drawable.zip);
+        sounds.withIcon(R.drawable.music);
+        videos.withIcon(R.drawable.video);
         result = new DrawerBuilder()
                 .withActivity(getActivity())
                 .withToolbar(toolbar)
@@ -870,7 +874,7 @@ else{createmenu.setVisible(true);}
                             control=FileTransactions.getListPic();
                             listList(FileTransactions.getListPic());
                             if (control.size() == 0) {
-                                showErrorBox("Görüntü dosyası bulunumadı");
+                                showErrorBox("Görüntü dosyası bulunamadı");
                                 listRoots();
                                 updateName("Directory");
                             }
@@ -881,7 +885,7 @@ else{createmenu.setVisible(true);}
 
                             listList(FileTransactions.getListDoc());
                             if (control.size() == 0) {
-                                showErrorBox("Döküman bulunumadı");
+                                showErrorBox("Döküman bulunamadı");
                                 listRoots();
                                 updateName("Directory");
                             }
@@ -892,7 +896,7 @@ else{createmenu.setVisible(true);}
                             control=FileTransactions.getListSound();
 
                             if (control.size() == 0) {
-                                showErrorBox("Ses dosyası bulunumadı;");
+                                showErrorBox("Ses dosyası bulunamadı;");
                                 listRoots();
                                 updateName("Directory");
                             }
@@ -903,7 +907,7 @@ else{createmenu.setVisible(true);}
                             control=FileTransactions.getListCompress();
 
                             if (control.size() == 0) {
-                                showErrorBox("Sıkıştırılmış arşiv dosyası bulunumadı;");
+                                showErrorBox("Sıkıştırılmış arşiv dosyası bulunamadı;");
                                 listRoots();
                                 updateName("Directory");
                             }
@@ -914,7 +918,7 @@ else{createmenu.setVisible(true);}
                             control=FileTransactions.getListVideo();
 
                             if (control.size() == 0) {
-                                showErrorBox("Video dosyası bulunumadı");
+                                showErrorBox("Video dosyası bulunamadı");
                                 listRoots();
                                 updateName("Directory");
                             }
@@ -1009,20 +1013,20 @@ if(copyList.get(count).getParent().equals(path))
         for (int count=0;count<items.size();count++)
         {
             if(items.get(count).getCheck()) {
-                infoList.add("Name:" + " " + items.get(count).getTitle());
-                infoList.add("Location:" + " " + items.get(count).getThumb());
+                infoList.add("İsim:" + " " + items.get(count).getTitle());
+                infoList.add("Konum:" + " " + items.get(count).getThumb());
 
                 File infof=new File(items.get(count).getThumb());
                 Date dd=new Date(infof.lastModified());
                 if(infof.isDirectory())
                 {   String files[] = infof.list();
                     int filesLength = files.length;
-                    infoList.add("Size:" + " "+ filesLength + " "+ "Items");
-                    infoList.add("Date:"+ " "+ dd);
+                    infoList.add("Boyut:" + " "+ filesLength + " "+ "Parça");
+                    infoList.add("Oluşturulma Tarihi:"+ " "+ dd);
                 }
                 else{
                     infoList.add("Boyut:"+" "+items.get(count).getSubtitle());
-                    infoList.add("Date:"+ " "+ dd);
+                    infoList.add("Oluşturulma Tarihi:"+ " "+ dd);
                 }
             }
         }

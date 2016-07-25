@@ -14,7 +14,7 @@
         android:title="Sil"
         myapp:showAsAction="always"/>
     <item android:id="@+id/create"
-        android:title="Create Folder"/>
+        android:title="Dosya Oluştur"/>
     <item android:id="@+id/move"
         android:icon="@drawable/ic_content_cut_black_24dp"
         android:title="Taşı"/>
