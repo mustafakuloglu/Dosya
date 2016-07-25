@@ -5,7 +5,6 @@ import com.sromku.simple.storage.Storage;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 import gm.com.dosya.fragments.DirectoryFragment;
 
@@ -21,11 +20,13 @@ public class FileTransactions {
     private static ArrayList<File> listDoc;
     private static ArrayList<File> listCompress;
     private DirectoryFragment directoryFragment;
+    static ArrayList<String> son;
     public FileTransactions()
     {
         storage= SimpleStorage.getExternalStorage();
         frag=new DirectoryFragment();
         directoryFragment=new DirectoryFragment();
+        son=new ArrayList<>();
     }
 
 
@@ -96,22 +97,59 @@ public class FileTransactions {
             e.printStackTrace();
         }
     }
-    private ArrayList<String> getItemPtah(ArrayList<String> paths)
+    private static ArrayList<String> getItemPtah(ArrayList<String> paths)
     {
-        ArrayList<String> son=new ArrayList<>();
+
+        File media;
+        for (String path : paths)
+        {
+            media=new File(path);
+            try {
+
+                if (media.isDirectory()) {
+                    if(media.getName().startsWith("."))
+                    {
+                        continue;
+                    }
+ArrayList<String> gecici=new ArrayList<>();
+                    String files[] = media.list();
+                    int filesLength = files.length;
+
+                    for (int i = 0; i < filesLength; i++) {
+
+                       gecici.add(path+"/"+files[i]);
+
+                    }
+                    getItemPtah(gecici);
+
+                } else {
+                   son.add(media.getPath());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
 return son;
     }
     public static void catagoryMedia() {
         mediaPathList = (ArrayList<String>) UtilityMethods.getMediaPath();
         File media;
+        son=new ArrayList<>();
+        listPic= new ArrayList<>();
+        listSound=new ArrayList<>();
+        listVideo=new ArrayList<>();
+        listDownload=new ArrayList<>();
+        listDoc=new ArrayList<>();
+        listCompress=new ArrayList<>();
+        mediaPathList=getItemPtah(mediaPathList);
 
         for(String path:mediaPathList)
         {
             media=new File(path);
             if(media.getPath().endsWith(".jpg") ||media.getPath().endsWith(".png") ||media.getPath().endsWith(".jpeg" )||media.getPath().endsWith(".gif" )||media.getPath().endsWith(".raw" ))
             {
-                listPic.add(media);
+                listPic.add(new File(path));
             }
             if(media.getPath().endsWith(".zip") ||media.getPath().endsWith(".rar") ||media.getPath().endsWith(".7z" )||media.getPath().endsWith(".tar" )||media.getPath().endsWith(".apk" ))
             {
@@ -120,10 +158,6 @@ return son;
             if(media.getPath().endsWith(".ppt") ||media.getPath().endsWith(".pptx") ||media.getPath().endsWith(".doc" )||media.getPath().endsWith(".docx" )||media.getPath().endsWith(".xls" )||media.getPath().endsWith(".xlsx" )||media.getPath().endsWith(".txt" )||media.getPath().endsWith(".opt" ))
             {
                 listDoc.add(media);
-            }
-            if(media.getParent().endsWith("/Download") )
-            {
-                listDownload.add(media);
             }
             if(media.getPath().endsWith(".mp4") ||media.getPath().endsWith(".mpeg") ||media.getPath().endsWith(".avi" )||media.getPath().endsWith(".3gp" )||media.getPath().endsWith(".mkv" )||media.getPath().endsWith(".flv" )||media.getPath().endsWith(".ogg" )||media.getPath().endsWith(".ogv" )||media.getPath().endsWith(".wmp" )||media.getPath().endsWith(".amv" ))
             {

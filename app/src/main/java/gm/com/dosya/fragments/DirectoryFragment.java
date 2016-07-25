@@ -33,7 +33,6 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
@@ -62,7 +61,6 @@ public class DirectoryFragment extends Fragment {
     private static String title_ = "";
     public String ilkelPath = null;
     public ArrayList<File> copyList;
-    private ArrayList<String> infoList;
     Button yapis;
     String rename = null;
     String copyPath = null;
@@ -72,7 +70,7 @@ public class DirectoryFragment extends Fragment {
     String targetPath = null;
     String renamePath = null;
     String silPath = null;
-    String newzipfolder=null;
+    String newzipfolder = null;
     int counter = 0;
     CheckBox check;
     boolean click = true;
@@ -94,6 +92,7 @@ public class DirectoryFragment extends Fragment {
     private long sizeLimit = 1024 * 1024 * 1024;
     private String[] chhosefileType = {".pdf", ".doc", ".docx", ".DOC", ".DOCX"};
     private UtilityMethods util;
+    private ArrayList<String> infoList;
     Storage storage;
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -213,8 +212,8 @@ public class DirectoryFragment extends Fragment {
             getActivity().registerReceiver(receiver, util.getIntent());
         }
         copyList = new ArrayList<File>();
-        zipList=new ArrayList<>();
-        infoList=new ArrayList<>();
+        zipList = new ArrayList<>();
+        infoList = new ArrayList<>();
 
         if (fragmentView == null) {
             fragmentView = inflater.inflate(R.layout.document_select_layout,
@@ -237,7 +236,7 @@ public class DirectoryFragment extends Fragment {
                 @Override
                 public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-                    counter=0;
+                    counter = 0;
                     ilkelPath = items.get(position).getThumb();
                     itemname = items.get(position).getTitle();
                     rename = items.get(position).getTitle();
@@ -529,8 +528,10 @@ public class DirectoryFragment extends Fragment {
         baseAdapter.notifyDataSetChanged();
         return true;
     }
-    private boolean listList(ArrayList<File> mediaFile)
-    {
+
+    private boolean listList(ArrayList<File> mediaFile) {
+        items.clear();
+
         for (File file : mediaFile) {
 
             if (file.getName().startsWith(".") || file.getName().endsWith(".dm")) {
@@ -554,20 +555,25 @@ public class DirectoryFragment extends Fragment {
                         || fname.endsWith(".gif") || fname.endsWith(".jpeg")) {
                     item.setThumb(file.getAbsolutePath());
                     item.setIcon(R.drawable.foto);
+                    updateName("GÖRÜNTÜLER");
                 }
 
 
                 if (fname.endsWith(".mp3") || (fname.endsWith(".amr"))) {
                     item.setIcon(R.drawable.music);
+                    updateName("SESLER");
                 }
                 if (fname.endsWith(".zip") || (fname.endsWith(".rar"))) {
                     item.setIcon(R.drawable.zip);
+                    updateName("ARŞİV");
                 }
-                if (fname.endsWith(".docx")) {
+                if (fname.endsWith(".docx") || fname.endsWith(".txt") || fname.endsWith(".doc")) {
                     item.setIcon(R.drawable.word);
+                    updateName("DÖKÜMAN");
                 }
                 if (fname.endsWith(".mp4") || (fname.endsWith(".mpg")) || (fname.endsWith(".avi")) || (fname.endsWith(".3gp"))) {
                     item.setIcon(R.drawable.video);
+                    updateName("VİDEO");
                 }
                 if (fname.endsWith(".pdf")) {
                     item.setIcon(R.drawable.pdf);
@@ -620,9 +626,9 @@ public class DirectoryFragment extends Fragment {
         final MenuItem copymenu = menu.findItem(R.id.copy);
         final MenuItem duzenlemenu = menu.findItem(R.id.duzenle);
         final MenuItem tasimenu = menu.findItem(R.id.move);
-        final MenuItem createmenu=menu.findItem(R.id.create);
-        final MenuItem zipmenu=menu.findItem(R.id.zip);
-        final MenuItem infomenu=menu.findItem(R.id.info);
+        final MenuItem createmenu = menu.findItem(R.id.create);
+        final MenuItem zipmenu = menu.findItem(R.id.zip);
+        final MenuItem infomenu = menu.findItem(R.id.info);
 
         yapistirmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -645,6 +651,27 @@ public class DirectoryFragment extends Fragment {
                 }
 
 
+                return false;
+            }
+        });
+        infomenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                infoliste();
+                MaterialDialog builder = new MaterialDialog.Builder(getActivity())
+                        .title("Özellikler")
+                        .items(infoList)
+                        .itemsCallback(new MaterialDialog.ListCallback() {
+                            @Override
+                            public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                            }
+                        })
+                        .negativeText("İPTAL")
+                        .positiveText("OK")
+                        .show();
+                listFiles(currentDir);
+                infoList.clear();
+                click = true;
                 return false;
             }
         });
@@ -703,27 +730,7 @@ public class DirectoryFragment extends Fragment {
                 return false;
             }
         });
-        infomenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                infoliste();
-                MaterialDialog builder = new MaterialDialog.Builder(getActivity())
-                        .title("Özellikler")
-                        .items(infoList)
-                        .itemsCallback(new MaterialDialog.ListCallback() {
-                            @Override
-                            public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                            }
-                        })
-                        .negativeText("İPTAL")
-                        .positiveText("OK")
-                        .show();
-                listFiles(currentDir);
-                infoList.clear();
-                click = true;
-                return false;
-            }
-        });
+
         duzenlemenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -763,14 +770,14 @@ public class DirectoryFragment extends Fragment {
                         .input(null, null, new MaterialDialog.InputCallback() {
                             @Override
                             public void onInput(MaterialDialog dialog, CharSequence input) {
-                            String   anewzipfolder = input.toString();
-                                newzipfolder=anewzipfolder;
+                                String anewzipfolder = input.toString();
+                                newzipfolder = anewzipfolder;
                                 ziple();
                                 listFiles(currentDir);
                             }
                         }).negativeText("Cancel").show();
 
-                click=true;
+                click = true;
                 return false;
             }
         });
@@ -813,32 +820,72 @@ public class DirectoryFragment extends Fragment {
 
 
     private void drawerProcesses() {
-        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("GENERAL MOBİLE");
-        final SecondaryDrawerItem item2 = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(2).withName("Galeri");
-        SecondaryDrawerItem item3 = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(3).withName("Cihaz Bilgisi");
+        final PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("GENERAL MOBİLE");
+        final SecondaryDrawerItem pics = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(2).withName("Görüntüler");
+        final SecondaryDrawerItem docs = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(3).withName("Dökümanlar");
+        final SecondaryDrawerItem comps = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(4).withName("Sıkıştırılmış");
+        final SecondaryDrawerItem videos = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(5).withName("Videolar");
+        final SecondaryDrawerItem sounds = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(6).withName("Sesler");
+
+
         item1.withIcon(R.drawable.gm);
-        item2.withIcon(R.drawable.galeri);
-        item3.withIcon(R.drawable.info);
+        pics.withIcon(R.drawable.galeri);
+        docs.withIcon(R.drawable.documents);
         result = new DrawerBuilder()
                 .withActivity(getActivity())
                 .withToolbar(toolbar)
                 .addDrawerItems(
                         item1,
-                        new DividerDrawerItem(),
-                        item2,
-                        new SecondaryDrawerItem().withName("Dökümanlar").withIcon(R.drawable.documents),
-                        item3
+                        pics,
+                        docs,
+                        comps,
+                        sounds,
+                        videos
 
 
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                       if(drawerItem==item2)
-                       {
-                           FileTransactions.catagoryMedia();
-                           listList(FileTransactions.getListPic());
-                       }
+                        if (drawerItem == pics) {
+                            FileTransactions.catagoryMedia();
+                            listList(FileTransactions.getListPic());
+                            if (FileTransactions.getListDoc().size() == 0) {
+                                showErrorBox("Görüntü dosyası bulunumadı");
+                            }
+                        }
+                        if (drawerItem == docs) {
+                            FileTransactions.catagoryMedia();
+                            listList(FileTransactions.getListDoc());
+                            if (FileTransactions.getListDoc().size() == 0) {
+                                showErrorBox("Döküman bulunumadı");
+                            }
+                        }
+                        if (drawerItem == sounds) {
+                            FileTransactions.catagoryMedia();
+                            listList(FileTransactions.getListSound());
+                            if (FileTransactions.getListDoc().size() == 0) {
+                                showErrorBox("Ses dosyası bulunumadı;");
+                            }
+                        }
+                        if (drawerItem == comps) {
+                            FileTransactions.catagoryMedia();
+                            listList(FileTransactions.getListCompress());
+                            if (FileTransactions.getListDoc().size() == 0) {
+                                showErrorBox("Sıkıştırılmış arşiv dosyası bulunumadı;");
+                            }
+                        }
+                        if (drawerItem == videos) {
+                            FileTransactions.catagoryMedia();
+                            listList(FileTransactions.getListVideo());
+                            if (FileTransactions.getListDoc().size() == 0) {
+                                showErrorBox("Video dosyası bulunumadı");
+                            }
+                        }
+                        if (drawerItem == item1) {
+                          listRoots();
+                            updateName("Directory");
+                        }
                         return false;
                     }
 
@@ -888,13 +935,13 @@ public class DirectoryFragment extends Fragment {
 //            }
 //
 //        }
-        String path= currentDir.getAbsolutePath();
+        String path = currentDir.getAbsolutePath();
 
         for (int count = 0; count < copyList.size(); count++) {
-
-            FileTransactions.moveFileOrDirectory(copyList.get(count),path);
-            if(copyList.get(count).isDirectory())
-            {
+            if(copyList.get(count).getParent().equals(path))
+            {continue;}
+            FileTransactions.moveFileOrDirectory(copyList.get(count), path);
+            if (copyList.get(count).isDirectory()) {
                 FileTransactions.DeleteRecursive(copyList.get(count));
             }
 
@@ -903,13 +950,15 @@ public class DirectoryFragment extends Fragment {
     }
 
     private void yapistir() {
-        String path= currentDir.getAbsolutePath();
+        String path = currentDir.getAbsolutePath();
         FileTransactions tran = new FileTransactions();
         paste = true;
 
         for (int count = 0; count < copyList.size(); count++) {
 
-            tran.copyFileOrDirectory(copyList.get(count),path);
+if(copyList.get(count).getParent().equals(path))
+{continue;}
+            tran.copyFileOrDirectory(copyList.get(count), path);
 
         }
 
@@ -942,18 +991,15 @@ public class DirectoryFragment extends Fragment {
 
         public void updateToolBarName(String name);
     }
-   private void ziple()
-   {
-       for (int count=0;count<items.size();count++)
-       {
-           if(items.get(count).getCheck())
-           {
-               zipList.add(items.get(count));
-           }
-       }
-       newzipfolder=currentDir.getPath()+"/"+newzipfolder+".zip";
-       ZipUtility.zipFileOrFolder(zipList,newzipfolder);
-   }
-}
 
+    private void ziple() {
+        for (int count = 0; count < items.size(); count++) {
+            if (items.get(count).getCheck()) {
+                zipList.add(items.get(count));
+            }
+        }
+        newzipfolder = currentDir.getPath() + "/" + newzipfolder + ".zip";
+        ZipUtility.zipFileOrFolder(zipList, newzipfolder);
+    }
 
+ }
