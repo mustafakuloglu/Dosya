@@ -36,7 +36,6 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
-import com.sromku.simple.storage.Storage;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -93,7 +92,6 @@ public class DirectoryFragment extends Fragment {
     private String[] chhosefileType = {".pdf", ".doc", ".docx", ".DOC", ".DOCX"};
     private UtilityMethods util;
     private ArrayList<String> infoList;
-    Storage storage;
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context arg0, Intent intent) {
@@ -314,11 +312,15 @@ public class DirectoryFragment extends Fragment {
                         if (items.get(position).getCheck()) {
                             items.get(position).setCheck(false);
                             counter--;
+
                         } else {
                             items.get(position).setCheck(true);
                             counter++;
 
+
                         }
+
+
                         baseAdapter.notifyDataSetChanged();
                     }
                 }
@@ -629,6 +631,12 @@ public class DirectoryFragment extends Fragment {
         final MenuItem createmenu = menu.findItem(R.id.create);
         final MenuItem zipmenu = menu.findItem(R.id.zip);
         final MenuItem infomenu = menu.findItem(R.id.info);
+if(counter==1)
+{duzenlemenu.setVisible(true);}
+else{duzenlemenu.setVisible(false);}
+if(counter>0)
+{createmenu.setVisible(false);}
+else{createmenu.setVisible(true);}
 
         yapistirmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -913,7 +921,7 @@ public class DirectoryFragment extends Fragment {
                         }
                         if (drawerItem == item1) {
                           listRoots();
-                            updateName("Directory");
+                             updateName("Directory");
                         }
                         return false;
                     }
