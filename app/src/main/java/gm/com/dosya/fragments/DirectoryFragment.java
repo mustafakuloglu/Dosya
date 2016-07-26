@@ -104,6 +104,7 @@ public class DirectoryFragment extends Fragment {
     private String[] chhosefileType = {".pdf", ".doc", ".docx", ".DOC", ".DOCX"};
     private UtilityMethods util;
     private ArrayList<String> infoList;
+    private String islem="";
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context arg0, Intent intent) {
@@ -661,7 +662,8 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
         yapistirmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                new copyAsyncClass().execute();
+              islem="yapistir";
+                new AsyncClass().execute();
 
                 return false;
             }
@@ -752,15 +754,8 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
                                      ad.setPositiveButton("Evet", new DialogInterface.OnClickListener() {
                 @Override
                         public void onClick(DialogInterface dialogInterface, int which) {
-                                for (int count = 0; count < items.size(); count++) {
-                                if (items.get(count).getCheck()) {
-                                        File cont = new File(items.get(count).getThumb());
-                                        FileTransactions.DeleteRecursive(cont);
-
-                                    }
-                                items.get(count).setVisible(false);
-                            }
-                        listFiles(currentDir);
+                                islem="sil";
+                    new AsyncClass().execute();
 
                         }
                                      });
@@ -831,21 +826,24 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
         zipmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-               try{ MaterialDialog builder = new MaterialDialog.Builder(getActivity())
-                        .title("Add Item")
-                        .widgetColor(getResources().getColor(R.color.colorPrimaryDark))
-                        .inputType(InputType.TYPE_CLASS_TEXT)
-                        .input(null, null, new MaterialDialog.InputCallback() {
-                            @Override
-                            public void onInput(MaterialDialog dialog, CharSequence input) {
-                                String anewzipfolder = input.toString();
-                                newzipfolder = anewzipfolder;
-                                ziple();
-                                listFiles(currentDir);
-                            }
-                        }).negativeText("Cancel").show();
+               try{
+                   islem="zip";
 
-                click = true;
+                   MaterialDialog builder = new MaterialDialog.Builder(getActivity())
+                           .title("Add Item")
+                           .widgetColor(getResources().getColor(R.color.colorPrimaryDark))
+                           .inputType(InputType.TYPE_CLASS_TEXT)
+                           .input(null, null, new MaterialDialog.InputCallback() {
+                               @Override
+                               public void onInput(MaterialDialog dialog, CharSequence input) {
+                                   String anewzipfolder = input.toString();
+                                   new AsyncClass().execute();
+                                   newzipfolder = anewzipfolder;
+
+                               }
+                           }).negativeText("Cancel").show();
+
+                   click = true;
                 return false;
                }
                catch (Exception e)
@@ -896,7 +894,7 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
 
     }
 
-    public class copyAsyncClass extends AsyncTask<String, String, String> {
+    public class AsyncClass extends AsyncTask<String, String, String> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -907,11 +905,29 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
 
         @Override
         protected String doInBackground(String... strings) {
+
+           switch (islem){
+               case "yapistir":
             if (tasi) {
                 kes();
             } else {
                 yapistir();
-            }
+            }break;
+               case "zip":
+                   ziple();
+                   break;
+               case"sil":
+                   for (int count = 0; count < items.size(); count++) {
+                       if (items.get(count).getCheck()) {
+                           File cont = new File(items.get(count).getThumb());
+                           FileTransactions.DeleteRecursive(cont);
+
+                       }
+                       items.get(count).setVisible(false);
+                   }
+                   break;
+           }
+
 
 
             return null;
@@ -920,19 +936,32 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            if (tasi) {
-                yapistirmenu.setVisible(false);
-                copymenu.setVisible(true);
-                tasimenu.setVisible(true);
-                tasi = false;
-                copyList.clear();
-                listFiles(currentDir);
-            } else {
-                yapistirmenu.setVisible(false);
-                copymenu.setVisible(true);
-                copyList.clear();
-                listFiles(currentDir);
+            switch (islem){
+                case "yapistir":
+                    if (tasi) {
+                        yapistirmenu.setVisible(false);
+                        copymenu.setVisible(true);
+                        tasimenu.setVisible(true);
+                        tasi = false;
+                        copyList.clear();
+                        listFiles(currentDir);
+                    } else {
+                        yapistirmenu.setVisible(false);
+                        copymenu.setVisible(true);
+                        copyList.clear();
+                        listFiles(currentDir);
+                    }
+
+                    break;
+                case "zip":
+
+                    listFiles(currentDir);
+                    break;
+                case"sil":
+                    listFiles(currentDir);
+                    break;
             }
+
             progress.dismiss();
         }
     }
@@ -1138,5 +1167,6 @@ if(copyList.get(count).getParent().equals(path))
     public ArrayList<HistoryEntry> getHistory(){
         return history;
     }
+
 
  }
