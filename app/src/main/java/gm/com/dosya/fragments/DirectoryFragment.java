@@ -20,7 +20,6 @@ import android.text.InputType;
 import android.util.Base64;
 import android.util.Log;
 import android.util.StateSet;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,7 +32,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.mikepenz.materialdrawer.Drawer;
@@ -176,9 +174,9 @@ public class DirectoryFragment extends Fragment {
         click = true;
         if (history.size() > 0) {
             HistoryEntry he = history.remove(history.size() - 1);
-            toolbar.setNavigationIcon(R.drawable.arrow);
+            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
             if (history.size() == 0) {
-                toolbar.setNavigationIcon(R.drawable.back);
+                toolbar.setNavigationIcon(R.drawable.ic_menu_black_24dp);
             }
 
             title_ = he.getTitle();
@@ -277,7 +275,7 @@ public class DirectoryFragment extends Fragment {
                                         int position, long l) {
                     if (click) {
                         if (history.size() == 0) {
-                            toolbar.setNavigationIcon(R.drawable.arrow);
+                            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
                         }
                         if (position < 0 || position >= items.size()) {
                             return;
@@ -327,9 +325,9 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
 
                         if (history.size() > 0) {
 
-                            toolbar.setNavigationIcon(R.drawable.arrow);
+                            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
                         } else {
-                            toolbar.setNavigationIcon(R.drawable.back);
+                            toolbar.setNavigationIcon(R.drawable.ic_menu_black_24dp);
                         }
                     } else {
                         if (items.get(position).getCheck()) {
@@ -388,8 +386,8 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
             ext.setIcon(Build.VERSION.SDK_INT < 9
-                    || Environment.isExternalStorageRemovable() ? R.drawable.ic_external_storage
-                    : R.drawable.ic_storage);
+                    || Environment.isExternalStorageRemovable() ? R.drawable.ic_inbox_black_24dp
+                    : R.drawable.ic_inbox_black_24dp);
         }
 
         ext.setSubtitle(util.getRootSubtitle(extStorage));
@@ -430,7 +428,7 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
                         } else {
                             ext.setTitle("ExternalStorage");
                         }
-                        item.setIcon(R.drawable.ic_external_storage);
+                        item.setIcon(R.drawable.ic_inbox_black_24dp);
                         item.setTitle("Sdcard");
                         item.setSubtitle(util.getRootSubtitle(path));
                         item.setFile(new File(path));
@@ -443,6 +441,12 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
         } catch (Exception e) {
             Log.e("tmessages", e.toString());
         }
+        ListItem fs = new ListItem();
+        fs.setTitle("Root Dosyaları");
+        fs.setSubtitle("SystemRoot");
+        fs.setIcon(R.drawable.ic_folder_black_24dp);
+        fs.setFile(new File("Root Dosyaları"));
+        items.add(fs);
 
         baseAdapter.notifyDataSetChanged();
     }
@@ -507,7 +511,7 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
             item.setFile(file);
             item.setThumb(file.getAbsolutePath());
             if (file.isDirectory()) {
-                item.setIcon(R.drawable.ic_directory);
+                item.setIcon(R.drawable.ic_folder_black_24dp);
                 item.setSubtitle("Folder");
             } else {
                 String fname = file.getName();
@@ -518,24 +522,32 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
                 if (fname.endsWith(".jpg") || fname.endsWith(".png")
                         || fname.endsWith(".gif") || fname.endsWith(".jpeg")) {
                     item.setThumb(file.getAbsolutePath());
-                    item.setIcon(R.drawable.foto);
+                    item.setIcon(R.drawable.ic_photo_black_24dp);
                 }
 
 
-                if (fname.endsWith(".mp3") || (fname.endsWith(".amr"))) {
-                    item.setIcon(R.drawable.music);
+                else if (fname.endsWith(".mp3") || (fname.endsWith(".amr"))) {
+                    item.setIcon(R.drawable.ic_audiotrack_black_24dp);
                 }
-                if (fname.endsWith(".zip") || (fname.endsWith(".rar"))) {
-                    item.setIcon(R.drawable.zip);
+                else if (fname.endsWith(".zip") || (fname.endsWith(".rar"))) {
+                    item.setIcon(R.drawable.ic_gradient_black_24dp);
                 }
-                if (fname.endsWith(".docx")) {
+                else if (fname.endsWith(".docx")) {
                     item.setIcon(R.drawable.word);
                 }
-                if (fname.endsWith(".mp4") || (fname.endsWith(".mpg")) || (fname.endsWith(".avi")) || (fname.endsWith(".3gp"))) {
-                    item.setIcon(R.drawable.video);
+                else if (fname.endsWith(".mp4") || (fname.endsWith(".mpg")) || (fname.endsWith(".avi")) || (fname.endsWith(".3gp"))) {
+                    item.setIcon(R.drawable.ic_local_movies_black_24dp);
                 }
-                if (fname.endsWith(".pdf")) {
-                    item.setIcon(R.drawable.pdf);
+                else if (fname.endsWith(".gif"))
+                {
+                    item.setIcon(R.drawable.ic_gif_black_24dp);
+                }
+                else if (fname.endsWith(".pdf")) {
+                    item.setIcon(R.drawable.ic_picture_as_pdf_black_24dp);
+                }
+                else
+                {
+                    item.setIcon(R.drawable.ic_local_florist_black_24dp);
                 }
             }
 
@@ -562,7 +574,7 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
             item.setFile(file);
             item.setThumb(file.getAbsolutePath());
             if (file.isDirectory()) {
-                item.setIcon(R.drawable.ic_directory);
+                item.setIcon(R.drawable.ic_folder_black_24dp);
                 item.setSubtitle("Folder");
             } else {
                 String fname = file.getName();
@@ -573,29 +585,32 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
                 if (fname.endsWith(".jpg") || fname.endsWith(".png")
                         || fname.endsWith(".gif") || fname.endsWith(".jpeg")) {
                     item.setThumb(file.getAbsolutePath());
-                    item.setIcon(R.drawable.foto);
-                    updateName("GÖRÜNTÜLER");
+                    item.setIcon(R.drawable.ic_photo_black_24dp);
                 }
 
 
-                if (fname.endsWith(".mp3") || (fname.endsWith(".amr"))) {
-                    item.setIcon(R.drawable.music);
-                    updateName("SESLER");
+                else if (fname.endsWith(".mp3") || (fname.endsWith(".amr"))) {
+                    item.setIcon(R.drawable.ic_audiotrack_black_24dp);
                 }
-                if (fname.endsWith(".zip") || (fname.endsWith(".rar"))) {
-                    item.setIcon(R.drawable.zip);
-                    updateName("ARŞİV");
+                else if (fname.endsWith(".zip") || (fname.endsWith(".rar"))) {
+                    item.setIcon(R.drawable.ic_gradient_black_24dp);
                 }
-                if (fname.endsWith(".docx") || fname.endsWith(".txt") || fname.endsWith(".doc")) {
+                else if (fname.endsWith(".docx")) {
                     item.setIcon(R.drawable.word);
-                    updateName("DÖKÜMAN");
                 }
-                if (fname.endsWith(".mp4") || (fname.endsWith(".mpg")) || (fname.endsWith(".avi")) || (fname.endsWith(".3gp"))) {
-                    item.setIcon(R.drawable.video);
-                    updateName("VİDEO");
+                else if (fname.endsWith(".mp4") || (fname.endsWith(".mpg")) || (fname.endsWith(".avi")) || (fname.endsWith(".3gp"))) {
+                    item.setIcon(R.drawable.ic_local_movies_black_24dp);
                 }
-                if (fname.endsWith(".pdf")) {
-                    item.setIcon(R.drawable.pdf);
+                else if (fname.endsWith(".gif"))
+                {
+                    item.setIcon(R.drawable.ic_gif_black_24dp);
+                }
+                else if (fname.endsWith(".pdf")) {
+                    item.setIcon(R.drawable.ic_picture_as_pdf_black_24dp);
+                }
+                else
+                {
+                    item.setIcon(R.drawable.ic_local_florist_black_24dp);
                 }
             }
 
@@ -632,10 +647,6 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-
-
-
-
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
@@ -975,11 +986,11 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
 
 
         item1.withIcon(R.drawable.gm);
-        pics.withIcon(R.drawable.galeri);
-        docs.withIcon(R.drawable.documents);
-        comps.withIcon(R.drawable.zip);
-        sounds.withIcon(R.drawable.music);
-        videos.withIcon(R.drawable.video);
+        pics.withIcon(R.drawable.ic_photo_black_24dp);
+        docs.withIcon(R.drawable.ic_folder_black_24dp);
+        comps.withIcon(R.drawable.ic_gradient_black_24dp);
+        sounds.withIcon(R.drawable.ic_audiotrack_black_24dp);
+        videos.withIcon(R.drawable.ic_local_movies_black_24dp);
         result = new DrawerBuilder()
                 .withActivity(getActivity())
                 .withToolbar(toolbar)
@@ -1134,7 +1145,7 @@ if(copyList.get(count).getParent().equals(path))
                 if(infof.isDirectory())
                 {   String files[] = infof.list();
                     int filesLength = files.length;
-                    infoList.add("Boyut:" + " "+ filesLength + " "+ "Parça");
+                    infoList.add("Boyut:" + " "+ filesLength + " "+ "Items");
                     infoList.add("Son Değişiklik:"+ " "+ dd);
                 }
                 else{
@@ -1144,12 +1155,6 @@ if(copyList.get(count).getParent().equals(path))
             }
         }
     }
-
-
-
-
-
-
     public static abstract interface DocumentSelectActivityDelegate {
         public void didSelectFiles(DirectoryFragment activity, ArrayList<String> files);
 

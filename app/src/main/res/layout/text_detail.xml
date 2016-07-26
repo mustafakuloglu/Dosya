@@ -13,7 +13,7 @@
 
             android:paddingTop="5dp"
             android:id="@+id/imageView"
-            android:src="@drawable/ic_external_storage" />
+            android:src="@drawable/ic_folder_black_24dp" />
 
         <TextView
             android:layout_width="wrap_content"
