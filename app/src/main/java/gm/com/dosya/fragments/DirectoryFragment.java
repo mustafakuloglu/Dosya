@@ -20,6 +20,7 @@ import android.text.InputType;
 import android.util.Base64;
 import android.util.Log;
 import android.util.StateSet;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,6 +33,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.mikepenz.materialdrawer.Drawer;
@@ -440,12 +442,6 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
         } catch (Exception e) {
             Log.e("tmessages", e.toString());
         }
-        ListItem fs = new ListItem();
-        fs.setTitle("Root Dosyaları");
-        fs.setSubtitle("SystemRoot");
-        fs.setIcon(R.drawable.ic_directory);
-        fs.setFile(new File("Root Dosyaları"));
-        items.add(fs);
 
         baseAdapter.notifyDataSetChanged();
     }
@@ -635,6 +631,10 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+
+
+
+
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
@@ -1115,6 +1115,12 @@ if(copyList.get(count).getParent().equals(path))
             }
         }
     }
+
+
+
+
+
+
     public static abstract interface DocumentSelectActivityDelegate {
         public void didSelectFiles(DirectoryFragment activity, ArrayList<String> files);
 
