@@ -1134,7 +1134,7 @@ if(copyList.get(count).getParent().equals(path))
                 if(infof.isDirectory())
                 {   String files[] = infof.list();
                     int filesLength = files.length;
-                    infoList.add("Boyut:" + " "+ filesLength + " "+ "Items");
+                    infoList.add("Boyut:" + " "+ filesLength + " "+ "Parça");
                     infoList.add("Son Değişiklik:"+ " "+ dd);
                 }
                 else{
