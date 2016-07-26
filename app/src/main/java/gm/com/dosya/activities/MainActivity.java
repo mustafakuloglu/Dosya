@@ -91,41 +91,41 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-        try {
-            if(mDirectoryFragment.getHistory().size()==0&&mDirectoryFragment.catagory==false) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+            try {
+                if(mDirectoryFragment.getHistory().size()==0&&mDirectoryFragment.catagory==false) {
 
 
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this); //Mesaj Penceresini Yaratalım
-                alertDialogBuilder.setTitle("Programdan çıkılsın mı?").setCancelable(false).setPositiveButton("Evet", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) { //Eğer evet butonuna basılırsa
-                        dialog.dismiss();
-                        android.os.Process.killProcess(android.os.Process.myPid());
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this); //Mesaj Penceresini Yaratalım
+                    alertDialogBuilder.setTitle("Programdan çıkılsın mı?").setCancelable(false).setPositiveButton("Evet", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) { //Eğer evet butonuna basılırsa
+                            dialog.dismiss();
+                            android.os.Process.killProcess(android.os.Process.myPid());
 //Uygulamamızı sonlandırıyoruz.
-                    }
+                        }
 
-                }).setNegativeButton("Hayır", new DialogInterface.OnClickListener() {
+                    }).setNegativeButton("Hayır", new DialogInterface.OnClickListener() {
 
 //Eğer hayır butonuna basılırsa
 
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(getApplicationContext(), "Programdan çıkmaktan vazgeçtiniz.", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(getApplicationContext(), "Programdan çıkmaktan vazgeçtiniz.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
 
-                alertDialogBuilder.create().show();
+                    alertDialogBuilder.create().show();
 //son olarak alertDialogBuilder'ı oluşturup ekranda görüntületiyoruz.
-            }return super.onKeyDown(keyCode, event);
-   } catch (IllegalStateException e) {  //yapımızı try-catch blogu içerisine aldık
-       //hata ihtimaline karşı.
-               e.printStackTrace();
-   }
-        return super.onKeyDown(keyCode, event);
+                }return super.onKeyDown(keyCode, event);
+            } catch (IllegalStateException e) {  //yapımızı try-catch blogu içerisine aldık
+                //hata ihtimaline karşı.
+                e.printStackTrace();
+            }
+            return super.onKeyDown(keyCode, event);
+        }
+        return false;
     }
-return false;
- }
 
     @Override
     protected void onDestroy() {
@@ -138,7 +138,7 @@ return false;
         if (mDirectoryFragment.onBackPressed_()) {
             if(mDirectoryFragment.catagory==false){
                 super.onBackPressed();
-        }}
+            }}
     }
 
 
