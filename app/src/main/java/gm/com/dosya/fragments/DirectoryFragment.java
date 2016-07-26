@@ -105,6 +105,7 @@ public class DirectoryFragment extends Fragment {
     private UtilityMethods util;
     private ArrayList<String> infoList;
     private String islem="";
+    public boolean catagory=false;
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context arg0, Intent intent) {
@@ -168,28 +169,36 @@ public class DirectoryFragment extends Fragment {
 
 
     public boolean onBackPressed_() {
-        for (int count = 0; count < items.size(); count++) {
-            items.get(count).setVisible(false);
-        }
-        click = true;
-        if (history.size() > 0) {
-            HistoryEntry he = history.remove(history.size() - 1);
-            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
-            if (history.size() == 0) {
-                toolbar.setNavigationIcon(R.drawable.ic_menu_black_24dp);
-            }
+        if (catagory) {
 
-            title_ = he.getTitle();
-            updateName(title_);
-            if (he.getDir() != null) {
-                listFiles(he.getDir());
-            } else {
-                listRoots();
-            }
-            listView.setSelectionFromTop(he.getScrollItem(), he.getScrollOffset());
+            items.clear();
+            listRoots();
+            catagory=false;
             return false;
         } else {
-            return true;
+            for (int count = 0; count < items.size(); count++) {
+                items.get(count).setVisible(false);
+            }
+            click = true;
+            if (history.size() > 0) {
+                HistoryEntry he = history.remove(history.size() - 1);
+                toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
+                if (history.size() == 0) {
+                    toolbar.setNavigationIcon(R.drawable.ic_menu_black_24dp);
+                }
+
+                title_ = he.getTitle();
+                updateName(title_);
+                if (he.getDir() != null) {
+                    listFiles(he.getDir());
+                } else {
+                    listRoots();
+                }
+                listView.setSelectionFromTop(he.getScrollItem(), he.getScrollOffset());
+                return false;
+            } else {
+                return true;
+            }
         }
     }
 
@@ -1008,6 +1017,7 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
                             FileTransactions.catagoryMedia();
                             control=FileTransactions.getListPic();
                             listList(FileTransactions.getListPic());
+                            catagory=true;
                             if (control.size() == 0) {
                                 showErrorBox("Görüntü dosyası bulunamadı");
                                 listRoots();
@@ -1017,6 +1027,7 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
                         if (drawerItem == docs) {
                             FileTransactions.catagoryMedia();
                             control=FileTransactions.getListDoc();
+                            catagory=true;
 
                             listList(FileTransactions.getListDoc());
                             if (control.size() == 0) {
@@ -1029,6 +1040,7 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
                             FileTransactions.catagoryMedia();
                             listList(FileTransactions.getListSound());
                             control=FileTransactions.getListSound();
+                            catagory=true;
 
                             if (control.size() == 0) {
                                 showErrorBox("Ses dosyası bulunamadı;");
@@ -1040,6 +1052,7 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
                             FileTransactions.catagoryMedia();
                             listList(FileTransactions.getListCompress());
                             control=FileTransactions.getListCompress();
+                            catagory=true;
 
                             if (control.size() == 0) {
                                 showErrorBox("Sıkıştırılmış arşiv dosyası bulunamadı;");
@@ -1051,6 +1064,7 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
                             FileTransactions.catagoryMedia();
                             listList(FileTransactions.getListVideo());
                             control=FileTransactions.getListVideo();
+                            catagory=true;
 
                             if (control.size() == 0) {
                                 showErrorBox("Video dosyası bulunamadı");
@@ -1059,7 +1073,10 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
                             }
                         }
                         if (drawerItem == item1) {
-                          listRoots();
+                          items.clear();
+                            catagory=false;
+                            listRoots();
+
                              updateName("Directory");
                         }
                         return false;

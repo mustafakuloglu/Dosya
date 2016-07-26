@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
         try {
-            if(mDirectoryFragment.getHistory().size()==0) {
+            if(mDirectoryFragment.getHistory().size()==0&&mDirectoryFragment.catagory==false) {
 
 
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this); //Mesaj Penceresini Yaratalım
@@ -136,8 +136,9 @@ return false;
     @Override
     public void onBackPressed() {
         if (mDirectoryFragment.onBackPressed_()) {
-            super.onBackPressed();
-        }
+            if(mDirectoryFragment.catagory==false){
+                super.onBackPressed();
+        }}
     }
 
 
