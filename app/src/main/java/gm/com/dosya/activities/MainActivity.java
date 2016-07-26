@@ -2,6 +2,7 @@ package gm.com.dosya.activities;
 
 import android.annotation.TargetApi;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -9,6 +10,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +25,7 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import gm.com.dosya.R;
 import gm.com.dosya.fragments.DirectoryFragment;
@@ -30,14 +33,20 @@ import gm.com.dosya.fragments.DirectoryFragment.DocumentSelectActivityDelegate;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int REQUEST_PERMISSIONS = 0;
     private Toolbar toolbar;
     private FragmentManager fragmentManager = null;
     private FragmentTransaction fragmentTransaction = null;
     private DirectoryFragment mDirectoryFragment;
+
+    int bellekokumaizni;
+    int bellekyazmaizni;
+    List<String> izinler = new ArrayList<String>();
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         View.OnClickListener mCorkyListener = new View.OnClickListener() {
@@ -55,6 +64,9 @@ public class MainActivity extends AppCompatActivity {
                                              }
 
         );
+
+
+
 
         new DrawerBuilder().withActivity(this).build();
         drawerProcesses();
@@ -126,7 +138,27 @@ public class MainActivity extends AppCompatActivity {
         }
         return false;
     }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch ( requestCode ) {
+            case REQUEST_PERMISSIONS: {
+                for( int i = 0; i < permissions.length; i++ ) { // İstediğimiz izinler dolaşalım
+                    if( grantResults[i] == PackageManager.PERMISSION_GRANTED ) { // Eğer izin verilmişse
+                        Log.d( "Permissions", "İzin Verildi: " + permissions[i] ); // İsmiyle birlikte izin verildi yazıp log basalım.
 
+// İzin verildiği için burada istediğiniz işlemleri yapabilirsiniz. Verilen izne göre sms okuyabilir ve belleğe yazabilirsiniz.
+                    } else if( grantResults[i] == PackageManager.PERMISSION_DENIED ) { // Eğer izin reddedildiyse
+                        Log.d( "Permissions", "İzin Reddedildi: " + permissions[i] ); // İsmiyle birlikte reddedildi yazıp log basalım.
+// Burada bir toast mesajı gösterebilirsiniz. Mesela bu işlemi yapabilmek için izin vermeniz gereklidir. gibi..
+                    }
+                }
+            }
+            break;
+            default: {
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            }
+        }
+    }
     @Override
     protected void onDestroy() {
         mDirectoryFragment.onFragmentDestroy();

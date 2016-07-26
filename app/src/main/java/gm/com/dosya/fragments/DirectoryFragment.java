@@ -1,11 +1,13 @@
 package gm.com.dosya.fragments;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -14,7 +16,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Base64;
@@ -49,6 +53,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import gm.com.dosya.R;
 import gm.com.dosya.adapters.BaseFragmentAdapter;
@@ -60,6 +65,7 @@ import gm.com.dosya.utils.ZipUtility;
 
 public class DirectoryFragment extends Fragment {
 
+    private static final int REQUEST_PERMISSIONS = 0;
     private static String title_ = "";
     public String ilkelPath = null;
     public ArrayList<File> copyList;
@@ -105,6 +111,9 @@ public class DirectoryFragment extends Fragment {
     private UtilityMethods util;
     private ArrayList<String> infoList;
     private String islem="";
+    int bellekokumaizni;
+    int bellekyazmaizni;
+    List<String> izinler = new ArrayList<String>();
     public boolean catagory=false;
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -235,6 +244,20 @@ public class DirectoryFragment extends Fragment {
         zipList = new ArrayList<>();
         infoList = new ArrayList<>();
         progress = new ProgressDialog(getActivity());
+        int bellekokumaizni = ContextCompat.checkSelfPermission(this.getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE);
+        int bellekyazmaizni = ContextCompat.checkSelfPermission(this.getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if(bellekokumaizni != PackageManager.PERMISSION_GRANTED){
+            izinler.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
+        if(bellekyazmaizni != PackageManager.PERMISSION_GRANTED)
+        {
+            izinler.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+
+        if(!izinler.isEmpty())
+        {
+            ActivityCompat.requestPermissions(this.getActivity(),izinler.toArray(new String[izinler.size()]) , REQUEST_PERMISSIONS);
+        }
 
         if (fragmentView == null) {
             fragmentView = inflater.inflate(R.layout.document_select_layout,
@@ -378,7 +401,50 @@ public class DirectoryFragment extends Fragment {
         toolbar.setNavigationOnClickListener(tool);
         return fragmentView;
     }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch ( requestCode ) {
+            case REQUEST_PERMISSIONS: {
+                for( int i = 0; i < permissions.length; i++ ) { // İstediğimiz izinler dolaşalım
+                    if( grantResults[i] == PackageManager.PERMISSION_GRANTED ) { // Eğer izin verilmişse
+                        ; // İsmiyle birlikte izin verildi yazıp log basalım.
 
+// İzin verildiği için burada istediğiniz işlemleri yapabilirsiniz. Verilen izne göre sms okuyabilir ve belleğe yazabilirsiniz.
+                    } else if( grantResults[i] == PackageManager.PERMISSION_DENIED ) { // Eğer izin reddedildiyse
+
+                        final AlertDialog.Builder izin=new AlertDialog.Builder(getActivity());
+                        izin.setTitle("Dosyayı sil");
+                        izin.setMessage("Programın çalışabilmesi için izin gereklidir");
+                        izin.setCancelable(false);
+                        izin.setPositiveButton("İzin ver", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int which) {
+                                ;
+                                ActivityCompat.requestPermissions(getActivity(),izinler.toArray(new String[izinler.size()]) , REQUEST_PERMISSIONS);
+
+
+                            }
+                        });
+
+                        izin.setNegativeButton("Çıkış", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int which) {
+
+                            }
+                        });
+
+                        AlertDialog alertDialog =izin.create();
+                        alertDialog.show();// İsmiyle birlikte reddedildi yazıp log basalım.
+// Burada bir toast mesajı gösterebilirsiniz. Mesela bu işlemi yapabilmek için izin vermeniz gereklidir. gibi..
+                    }
+                }
+            }
+            break;
+            default: {
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            }
+        }
+    }
     private void listRoots() {
         currentDir = null;
         items.clear();
