@@ -441,12 +441,6 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
         } catch (Exception e) {
             Log.e("tmessages", e.toString());
         }
-        ListItem fs = new ListItem();
-        fs.setTitle("Root Dosyaları");
-        fs.setSubtitle("SystemRoot");
-        fs.setIcon(R.drawable.ic_folder_black_24dp);
-        fs.setFile(new File("Root Dosyaları"));
-        items.add(fs);
 
         baseAdapter.notifyDataSetChanged();
     }
@@ -665,8 +659,10 @@ showErrorBox("Dosyayı açabilecek bir program bulunamadı!!");
         final MenuItem zipmenu = menu.findItem(R.id.zip);
         final MenuItem infomenu = menu.findItem(R.id.info);
         if(counter==1)
-        {duzenlemenu.setVisible(true);}
-        else{duzenlemenu.setVisible(false);}
+        {duzenlemenu.setVisible(true);
+         infomenu.setVisible(true);}
+        else{duzenlemenu.setVisible(false);
+             infomenu.setVisible(false);}
         if(counter>0)
         {createmenu.setVisible(false);}
         else{createmenu.setVisible(true);}
