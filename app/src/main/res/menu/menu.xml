@@ -17,7 +17,8 @@
         android:title="Klasör Oluştur"/>
     <item android:id="@+id/move"
         android:icon="@drawable/ic_content_cut_black_24dp"
-        android:title="Taşı"/>
+        android:title="Taşı"
+        myapp:showAsAction="always"/>
     <item android:id="@+id/yapistir"
         android:icon="@drawable/ic_content_paste_black_24dp"
         android:title="Yapıştır"
