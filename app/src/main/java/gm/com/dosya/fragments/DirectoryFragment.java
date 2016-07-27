@@ -217,7 +217,6 @@ public class DirectoryFragment extends Fragment {
             delegate.updateToolBarName(title_);
         }
     }
-
     public void onFragmentDestroy() {
         try {
             if (receiverRegistered) {
@@ -749,6 +748,7 @@ public class DirectoryFragment extends Fragment {
         {createmenu.setVisible(false);
         zipmenu.setVisible(true);}
         else{createmenu.setVisible(true);}
+
         yapistirmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -917,7 +917,8 @@ public class DirectoryFragment extends Fragment {
         zipmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                try{
+                try{  if(!catagory)
+                {
                     islem="zip";
 
                     MaterialDialog builder = new MaterialDialog.Builder(getActivity())
@@ -935,45 +936,60 @@ public class DirectoryFragment extends Fragment {
                             }).negativeText("Cancel").show();
 
                     click = true;
-                    return false;
+                }
+                else{
+                    showErrorBox("Burada Zip yapamazsınız");
+
+                }
+
+
                 }
                 catch (Exception e)
                 {showErrorBox("Sıkıştırma işlemi gerçekleştirilemedi");
-                    return false;
-                }
+
+                } return false;
             }
         });
 
         createmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                try{ MaterialDialog builder = new MaterialDialog.Builder(getActivity())
-                        .title("Add Item")
-                        .widgetColor(getResources().getColor(R.color.colorPrimaryDark))
-                        .inputType(InputType.TYPE_CLASS_TEXT)
-                        .input(null, null, new MaterialDialog.InputCallback() {
-                            @Override
-                            public void onInput(MaterialDialog dialog, CharSequence input) {
 
-                                String newfolder = input.toString();
-                                File folder = new File(currentDir.getAbsoluteFile() +
-                                        File.separator + newfolder);
-                                boolean success = true;
-                                if (!folder.exists()) {
-                                    success = folder.mkdir();
-                                }
-                                if (success) {
-                                    // Do something on success
-                                } else {
-                                    // Do something else on failure
-                                }
+                try{
+                    if(!catagory)
+                    {
+                        MaterialDialog builder = new MaterialDialog.Builder(getActivity())
+                                .title("Add Item")
+                                .widgetColor(getResources().getColor(R.color.colorPrimaryDark))
+                                .inputType(InputType.TYPE_CLASS_TEXT)
+                                .input(null, null, new MaterialDialog.InputCallback() {
+                                    @Override
+                                    public void onInput(MaterialDialog dialog, CharSequence input) {
 
-                                listFiles(currentDir);
-                            }
-                        }).negativeText("Cancel").show();
+                                        String newfolder = input.toString();
+                                        File folder = new File(currentDir.getAbsoluteFile() +
+                                                File.separator + newfolder);
+                                        boolean success = true;
+                                        if (!folder.exists()) {
+                                            success = folder.mkdir();
+                                        }
+                                        if (success) {
+                                            // Do something on success
+                                        } else {
+                                            // Do something else on failure
+                                        }
+
+                                        listFiles(currentDir);
+                                    }
+                                }).negativeText("Cancel").show();
 
 
-                    click = true;
+                        click = true;
+                    }
+                    else{
+                        showErrorBox("Burada klasör oluşturamazsınız");
+
+                    }
                     return false;
                 }
                 catch (Exception e)
