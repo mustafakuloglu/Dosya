@@ -738,8 +738,11 @@ public class DirectoryFragment extends Fragment {
             infomenu.setVisible(true);}
         else{duzenlemenu.setVisible(false);
             infomenu.setVisible(false);}
+        if(counter==0)
+        {zipmenu.setVisible(false);}
         if(counter>0)
-        {createmenu.setVisible(false);}
+        {createmenu.setVisible(false);
+        zipmenu.setVisible(true);}
         else{createmenu.setVisible(true);}
         yapistirmenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -1251,7 +1254,7 @@ public class DirectoryFragment extends Fragment {
             newzipfolder = currentDir.getPath() + "/" + newzipfolder + ".zip";
             ZipUtility.zipFileOrFolder(zipList, newzipfolder);
         }
-        catch (Exception e)
+        catch (RuntimeException e)
         {showErrorBox("Sıkıştırma işlemi gerçekleştirilemedi");
 
         } }

@@ -86,7 +86,7 @@ public class ZipUtility {
         }
     }
 
-    /*
+    /*}
  * gets the last path component
  *
  * Example: getLastPathComponent("downloads/example/fileToZip");
@@ -101,7 +101,8 @@ public class ZipUtility {
     }
 
     public static void zipFileOrFolder(ArrayList<ListItem> inputItemsList, String outZipPath) {
-        storage = SimpleStorage.getExternalStorage();
+        try {
+            storage = SimpleStorage.getExternalStorage();
 
             String gecici = inputItemsList.get(0).getFile().getParent() + "/zip";
             String gecici2 = gecici.substring(20);
@@ -110,10 +111,15 @@ public class ZipUtility {
                 FileTransactions.copyFileOrDirectory(inputItemsList.get(count).getFile(), gecici);
 
             }
-        zipFileAtPath(gecici,outZipPath);
+            zipFileAtPath(gecici, outZipPath);
 
             File gec = new File(gecici);
             FileTransactions.DeleteRecursive(gec);
+        }
+        catch (RuntimeException e)
+        {e.printStackTrace();}
+    }
+
 
     }
-}
+

@@ -30,6 +30,7 @@ import java.util.List;
 import gm.com.dosya.R;
 import gm.com.dosya.fragments.DirectoryFragment;
 import gm.com.dosya.fragments.DirectoryFragment.DocumentSelectActivityDelegate;
+import gm.com.dosya.utils.ZipUtility;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
     private FragmentManager fragmentManager = null;
     private FragmentTransaction fragmentTransaction = null;
     private DirectoryFragment mDirectoryFragment;
-
     int bellekokumaizni;
     int bellekyazmaizni;
     List<String> izinler = new ArrayList<String>();
@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
             public void didSelectFiles(DirectoryFragment activity,
                                        ArrayList<String> files) {
                 mDirectoryFragment.showErrorBox(files.get(0).toString());
+
             }
 
             @Override
