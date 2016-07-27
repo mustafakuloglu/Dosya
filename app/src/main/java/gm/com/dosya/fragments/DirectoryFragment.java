@@ -458,6 +458,7 @@ public class DirectoryFragment extends Fragment {
             } else {
                 ext.setTitle("Cihaz Belleği");
             }
+
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
             ext.setIcon(Build.VERSION.SDK_INT < 9
@@ -500,6 +501,7 @@ public class DirectoryFragment extends Fragment {
                         ListItem item = new ListItem();
                         if (path.toLowerCase().contains("sd")) {
                             ext.setTitle("Cihaz Belleği");
+
                         } else {
                             ext.setTitle("ExternalStorage");
                         }
@@ -1076,7 +1078,7 @@ public class DirectoryFragment extends Fragment {
         }
     }
     private void drawerProcesses() {
-        final PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("GENERAL MOBİLE");
+        final PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("ANA DİZİN");
         final SecondaryDrawerItem pics = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(2).withName("Görüntüler");
         final SecondaryDrawerItem docs = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(3).withName("Dökümanlar");
         final SecondaryDrawerItem comps = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(4).withName("Sıkıştırılmış Dosyalar");
@@ -1084,7 +1086,7 @@ public class DirectoryFragment extends Fragment {
         final SecondaryDrawerItem sounds = (SecondaryDrawerItem) new SecondaryDrawerItem().withIdentifier(6).withName("Sesler");
 
 
-        item1.withIcon(R.drawable.gm);
+        item1.withIcon(R.drawable.ic_launcher);
         pics.withIcon(R.drawable.ic_photo_black_24dp);
         docs.withIcon(R.drawable.ic_folder_black_24dp);
         comps.withIcon(R.drawable.ic_gradient_black_24dp);
