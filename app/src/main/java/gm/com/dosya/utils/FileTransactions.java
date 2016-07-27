@@ -36,9 +36,8 @@ public class FileTransactions {
 
 
     public static void copyFileOrDirectory(File src, String dstDir) {
-        storage= SimpleStorage.getExternalStorage();
-
         try {
+        storage= SimpleStorage.getExternalStorage();
             File dst = new File(dstDir);
 
             if (src.isDirectory()) {
@@ -64,39 +63,49 @@ public class FileTransactions {
     }
 
     public static void copyFile(File sourceFile, File destFile) throws IOException {
-        if (!destFile.getParentFile().exists())
-            destFile.getParentFile().mkdirs();
-
-        if (!destFile.exists()) {
-            destFile.createNewFile();
-        }
-
-        FileChannel source = null;
-        FileChannel destination = null;
-
         try {
-            source = new FileInputStream(sourceFile).getChannel();
-            destination = new FileOutputStream(destFile).getChannel();
-            destination.transferFrom(source, 0, source.size());
-        } finally {
-            if (source != null) {
-                source.close();
+            if (!destFile.getParentFile().exists())
+                destFile.getParentFile().mkdirs();
+
+            if (!destFile.exists()) {
+                destFile.createNewFile();
             }
-            if (destination != null) {
-                destination.close();
+
+            FileChannel source = null;
+            FileChannel destination = null;
+
+            try {
+                source = new FileInputStream(sourceFile).getChannel();
+                destination = new FileOutputStream(destFile).getChannel();
+                destination.transferFrom(source, 0, source.size());
+            } finally {
+                if (source != null) {
+                    source.close();
+                }
+                if (destination != null) {
+                    destination.close();
+                }
             }
+        }catch (RuntimeException e)
+        {
+            e.printStackTrace();
         }
     }
 
 
+
     public static void DeleteRecursive(File fileOrDirectory) {
-        if (fileOrDirectory.isDirectory())
+       try{ if (fileOrDirectory.isDirectory())
             for (File child : fileOrDirectory.listFiles())
                 DeleteRecursive(child);
 
         fileOrDirectory.delete();
 
     }
+       catch (NullPointerException e)
+       {e.printStackTrace();}
+    }
+
     public static void move(File file,String directoryname,String filename)
     {
         storage= SimpleStorage.getExternalStorage();

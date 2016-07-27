@@ -194,6 +194,7 @@ public class DirectoryFragment extends Fragment {
                 toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
                 if (history.size() == 0) {
                     toolbar.setNavigationIcon(R.drawable.ic_menu_black_24dp);
+
                 }
 
                 title_ = he.getTitle();
@@ -508,6 +509,7 @@ public class DirectoryFragment extends Fragment {
                         item.setSubtitle(util.getRootSubtitle(path));
                         item.setFile(new File(path));
                         items.add(item);
+
                     } catch (Exception e) {
                         Log.e("tmessages", e.toString());
                     }
@@ -521,6 +523,7 @@ public class DirectoryFragment extends Fragment {
     }
 
     private boolean listFiles(File dir) {
+        try{
         if (!dir.canRead()) {
             if (dir.getAbsolutePath().startsWith(
                     Environment.getExternalStorageDirectory().toString())
@@ -543,9 +546,11 @@ public class DirectoryFragment extends Fragment {
                     return true;
                 }
             }
-            showErrorBox("AccessError");
-            return false;
-        }
+
+
+        }}catch (Exception e)
+        {showErrorBox("AccessError");
+            return false;}
         emptyView.setText("Klasör Boş");
 
         try {
@@ -1003,6 +1008,7 @@ public class DirectoryFragment extends Fragment {
                     ziple();
                     break;
                 case"sil":
+                    try{
                     for (int count = 0; count < items.size(); count++) {
                         if (items.get(count).getCheck()) {
                             File cont = new File(items.get(count).getThumb());
@@ -1011,7 +1017,9 @@ public class DirectoryFragment extends Fragment {
                         }
                         items.get(count).setVisible(false);
                     }
-                    break;
+                    break;}
+                    catch (NullPointerException e)
+                    {showErrorBox("Silme işlemi yapılamadı");}
             }
 
 
@@ -1202,18 +1210,21 @@ public class DirectoryFragment extends Fragment {
     }
 
     private void yapistir() {
-        String path = currentDir.getAbsolutePath();
-        FileTransactions tran = new FileTransactions();
-        paste = true;
+        try {
+            String path = currentDir.getAbsolutePath();
+            FileTransactions tran = new FileTransactions();
+            paste = true;
 
-        for (int count = 0; count < copyList.size(); count++) {
+            for (int count = 0; count < copyList.size(); count++) {
 
-            if(copyList.get(count).getParent().equals(path))
-            {continue;}
-            tran.copyFileOrDirectory(copyList.get(count), path);
+                if (copyList.get(count).getParent().equals(path)) {
+                    continue;
+                }
+                tran.copyFileOrDirectory(copyList.get(count), path);
 
-        }
-
+            }
+        }catch (Exception e)
+        {showErrorBox("Yapıştıma işlemi yapılamadı");}
     }
     private void infoliste()
     {
