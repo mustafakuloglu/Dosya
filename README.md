@@ -8,3 +8,9 @@ Cihazınızdaki dosyaları ses,görüntü ve video gibi katagorilerde ayrı ayr�
 Geliştiriciler:Cömert BALDEMİR
                Mustafa KULOĞLU
                Abdulmelik KESİKBAŞ
+               
+          
+          
+          
+https://play.google.com/store/apps/details?id=gm.com.dosya&hl=tr
+https://play.google.com/store/apps/details?id=gm.com.filemanager&hl=tr
