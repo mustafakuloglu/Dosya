@@ -131,7 +131,9 @@ public class FileTransactions {
                 }
 
             } else {
-                storage.move(src, dst.getAbsolutePath().substring(20),src.getName());
+                File dest= new File(dst.getAbsolutePath()+"/"+src.getName());
+                src.renameTo(dest);
+//                storage.move(src, dst.getAbsolutePath().substring(20),src.getName());
             }
         } catch (Exception e) {
             e.printStackTrace();
