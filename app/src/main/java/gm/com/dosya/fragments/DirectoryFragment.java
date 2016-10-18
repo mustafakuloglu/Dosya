@@ -538,9 +538,9 @@ public class DirectoryFragment extends Fragment {
                     items.clear();
                     String state = Environment.getExternalStorageState();
                     if (Environment.MEDIA_SHARED.equals(state)) {
-                        emptyView.setText("UsbActive");
+                        emptyView.setText("Usb Aktif");
                     } else {
-                        emptyView.setText("NotMounted");
+                        emptyView.setText("Takılı Değil");
                     }
                     clearDrawableAnimation(listView);
                     baseAdapter.notifyDataSetChanged();
@@ -587,7 +587,7 @@ public class DirectoryFragment extends Fragment {
             item.setThumb(file.getAbsolutePath());
             if (file.isDirectory()) {
                 item.setIcon(R.drawable.ic_folder_black_24dp);
-                item.setSubtitle("Folder");
+                item.setSubtitle("Klasör");
             } else {
                 String fname = file.getName();
                 String[] sp = fname.split("\\.");
@@ -650,7 +650,7 @@ public class DirectoryFragment extends Fragment {
             item.setThumb(file.getAbsolutePath());
             if (file.isDirectory()) {
                 item.setIcon(R.drawable.ic_folder_black_24dp);
-                item.setSubtitle("Folder");
+                item.setSubtitle("Klasör");
             } else {
                 String fname = file.getName();
                 String[] sp = fname.split("\\.");
@@ -1117,7 +1117,7 @@ public class DirectoryFragment extends Fragment {
                             if (control.size() == 0) {
                                 showErrorBox("Görüntü dosyası bulunamadı");
                                 listRoots();
-                                updateName("Directory");
+                                updateName("Ana Dizin");
                             }
                         }
                         if (drawerItem == docs) {
@@ -1129,7 +1129,7 @@ public class DirectoryFragment extends Fragment {
                             if (control.size() == 0) {
                                 showErrorBox("Döküman bulunamadı");
                                 listRoots();
-                                updateName("Directory");
+                                updateName("Ana Dizin");
                             }
                         }
                         if (drawerItem == sounds) {
@@ -1141,7 +1141,7 @@ public class DirectoryFragment extends Fragment {
                             if (control.size() == 0) {
                                 showErrorBox("Ses dosyası bulunamadı;");
                                 listRoots();
-                                updateName("Directory");
+                                updateName("Ana Dizin");
                             }
                         }
                         if (drawerItem == comps) {
@@ -1153,7 +1153,7 @@ public class DirectoryFragment extends Fragment {
                             if (control.size() == 0) {
                                 showErrorBox("Sıkıştırılmış arşiv dosyası bulunamadı;");
                                 listRoots();
-                                updateName("Directory");
+                                updateName("Ana Dizin");
                             }
                         }
                         if (drawerItem == videos) {
@@ -1165,7 +1165,7 @@ public class DirectoryFragment extends Fragment {
                             if (control.size() == 0) {
                                 showErrorBox("Video dosyası bulunamadı");
                                 listRoots();
-                                updateName("Directory");
+                                updateName("Ana Dizin");
                             }
                         }
                         if (drawerItem == item1) {
@@ -1173,7 +1173,7 @@ public class DirectoryFragment extends Fragment {
                             catagory=false;
                             listRoots();
 
-                            updateName("Directory");
+                            updateName("Ana Dizin");
                         }
                         return false;
                     }
@@ -1257,7 +1257,7 @@ public class DirectoryFragment extends Fragment {
                 if(infof.isDirectory())
                 {   String files[] = infof.list();
                     int filesLength = files.length;
-                    infoList.add("Boyut:" + " "+ filesLength + " "+ "Items");
+                    infoList.add("Boyut:" + " "+ filesLength + " "+ "İtem");
                     infoList.add("Son Değişiklik:"+ " "+ dd);
                 }
                 else{

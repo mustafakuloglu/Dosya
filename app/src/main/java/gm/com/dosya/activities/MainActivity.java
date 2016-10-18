@@ -30,7 +30,6 @@ import java.util.List;
 import gm.com.dosya.R;
 import gm.com.dosya.fragments.DirectoryFragment;
 import gm.com.dosya.fragments.DirectoryFragment.DocumentSelectActivityDelegate;
-import gm.com.dosya.utils.ZipUtility;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -55,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
-        toolbar.setTitle("Directory");
+        toolbar.setTitle("Ana Dizin");
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
                                                  @Override
                                                  public void onClick(View view) {

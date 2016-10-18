@@ -32,7 +32,7 @@ public class UtilityMethods {
         if (total == 0) {
             return "";
         }
-        return "Free " + formatFileSize(free) + " of " + formatFileSize(total);
+        return "Boş: " + formatFileSize(free) + " Toplam: " + formatFileSize(total);
     }
 
     public static String formatFileSize(long size) {
